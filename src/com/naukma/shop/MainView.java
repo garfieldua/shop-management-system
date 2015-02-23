@@ -21,10 +21,10 @@ public class MainView extends JFrame {
 	public static void main(String[] args) {
 		
 		// singletone is not the best way to handle db connections
-		Dao provider = new Dao(MySQLProvider.getInstance());
+		//Dao provider = new Dao(MySQLProvider.getInstance());
 		
 		// using like this 
-		ResultSet allitems = provider.getAllItems();
+		//ResultSet allitems = provider.getAllItems();
 		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
