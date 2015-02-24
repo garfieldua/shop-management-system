@@ -11,9 +11,9 @@ public final class MySQLProvider extends AbstractDataProvider {
 	private Connection con;
 	private static MySQLProvider instance = null;
 	
-	public static final String URL = "";
-	public static final String USER = "";
-	public static final String PASSWORD = "";
+	public static final String URL = "jdbc:mysql://37.140.192.17/u0044137_default";
+	public static final String USER = "u0044137_default";
+	public static final String PASSWORD = "hTrzP0p~tJB@";
 	public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
 	private MySQLProvider() {
