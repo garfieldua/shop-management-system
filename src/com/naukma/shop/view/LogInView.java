@@ -88,7 +88,6 @@ public class LogInView extends Panel {
 		return textFieldPswd;
 	}
 
-	
 	public JTextField getTextFieldLogin() {
 		return textFieldLogin;
 	}
