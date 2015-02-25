@@ -88,9 +88,6 @@ public class LogInView extends Panel {
             public void actionPerformed(ActionEvent e)
             {
                 Dao db = new Dao(new MySQLProvider());
-                DaoResult rs = db.getDepartments();
-                
-                System.out.println("count departments ="+ rs.length());
                 
 				boolean result = db.checkLogin(LogInView.this.getTextFieldLogin().getText(), new String(LogInView.this.getTextFieldPswd().getPassword()));
 				if (!result) {

@@ -50,11 +50,6 @@ public class Dao {
 		this.provider.execute("INSERT INTO sold_item set employee_id='"+employeeId+"', quantity='"+quantity+"', product_id = '"+id+"',date='"+timestamp+"'");
 	} 
 	
-	//#15 Створити SQL запити для перегляду списку постачальників
-		public DaoResult getDepartments() {
-			return this.provider.execute("SELECT * FROM department");
-		}
-	
 	
 	//#15 Створити SQL запити для перегляду списку постачальників
 	public DaoResult getSuppliers() {
@@ -102,6 +97,11 @@ public class Dao {
 		return false;
 		
 	}
+	
+	public DaoResult executeRawQuery(String q){
+		return this.provider.execute(q);
+	}
+	
 	
 	/**
 	 * another methods (shouldn't be there)
