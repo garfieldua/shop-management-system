@@ -4,6 +4,6 @@ import java.sql.ResultSet;
 
 abstract public class AbstractDataProvider {
 	
-	abstract public ResultSet execute(String query);
+	abstract public DaoResult execute(String query);
 	
 }

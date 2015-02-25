@@ -16,7 +16,7 @@ public final class MySQLProvider extends AbstractDataProvider {
 	public static final String PASSWORD = "hTrzP0p~tJB@";
 	public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
-	private MySQLProvider() {
+	public MySQLProvider() {
 		try {
 			Class.forName(DRIVER_CLASS);
 			try {
@@ -36,14 +36,14 @@ public final class MySQLProvider extends AbstractDataProvider {
 		return instance;
 	}
 
-	public ResultSet execute(String query) {
+	public DaoResult execute(String query) {
 		try {
 			Statement s = con.createStatement();
 			
 			s.execute(query);
 			ResultSet rs = s.getResultSet();
 
-			return rs;
+			return new DaoResult(rs);
 		}
 
 		catch (SQLException e) {

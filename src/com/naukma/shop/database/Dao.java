@@ -3,8 +3,9 @@ package com.naukma.shop.database;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This is only a template
@@ -21,10 +22,7 @@ public class Dao {
 	
 	
 	// #21 Створити SQL запити для перегляду інформації про товар 
-	public ResultSet getProductInfo(int id) {
-		
-		// handle data as you want 
-		// the best practice to return something like ProductObject
+	public DaoResult getProductInfo(int id) {
 		return this.provider.execute("SELECT * FROM product WHERE id="+id);
 	} 
 	
@@ -32,15 +30,12 @@ public class Dao {
 	// if we need specified productId then we need to add another columnt to table 
 	// can return id of the created element
 	public void addNewProduct(String title,String description,String origin,int department,int quantity,int supplierId) {
-		ResultSet res = this.provider.execute("INSERT INTO product set title='"+title+"', description = '"+description+"', origin = '"+origin+"', department_id = '"+department+"'");
-		
-		long timestamp = System.currentTimeMillis() / 1000L;
-		//this.provider.execute("INSERT INTO supplied_item set supplier_id='"+supplierId+"', quantity='"+quantity+"', product_id = '"+res.id+"',date='"+timestamp+"'");
+		this.provider.execute("INSERT INTO product set title='"+title+"', description = '"+description+"', origin = '"+origin+"', department_id = '"+department+"'");
 	} 
 	
 	// #14 Створити SQL запити для фіксації надходження товарів
 	public void fixAddProduct(int id,int supplierId,int quantity) {
-		ResultSet res = this.provider.execute("UPDATE product SET quantity = quantity + "+quantity+" WHERE id = "+id);
+		this.provider.execute("UPDATE product SET quantity = quantity + "+quantity+" WHERE id = "+id);
 		
 		long timestamp = System.currentTimeMillis() / 1000L;
 		this.provider.execute("INSERT INTO supplied_item set supplier_id='"+supplierId+"', quantity='"+quantity+"', product_id = '"+id+"',date='"+timestamp+"'");
@@ -49,16 +44,21 @@ public class Dao {
 	
 	// #17 Створити SQL запити для фіксації продажів  database
 	public void fixBuyProduct(int id,int employeeId,int quantity) {
-		ResultSet res = this.provider.execute("UPDATE product SET quantity = quantity - "+quantity+" WHERE id = "+id);
+		this.provider.execute("UPDATE product SET quantity = quantity - "+quantity+" WHERE id = "+id);
 		
 		long timestamp = System.currentTimeMillis() / 1000L;
 		this.provider.execute("INSERT INTO sold_item set employee_id='"+employeeId+"', quantity='"+quantity+"', product_id = '"+id+"',date='"+timestamp+"'");
 	} 
 	
+	//#15 Створити SQL запити для перегляду списку постачальників
+		public DaoResult getDepartments() {
+			return this.provider.execute("SELECT * FROM department");
+		}
+	
 	
 	//#15 Створити SQL запити для перегляду списку постачальників
-	public ResultSet getSuppliers() {
-		return this.provider.execute("SELECT * FROM supplier ");
+	public DaoResult getSuppliers() {
+		return this.provider.execute("SELECT * FROM supplier");
 	} 
 	
 	// #24 Створити SQL запити для оформлення замовлення на товари #24
@@ -71,13 +71,14 @@ public class Dao {
 	} 
 	
 	// get requests for products
-	public ResultSet getProductRequests() {		
+	public DaoResult getProductRequests() {		
 		return this.provider.execute("SELECT * FROM warehouseitem WHERE status=0");
 	} 
 	// approve request
 	public void approveProductRequest(int requestId) throws SQLException {	
-		ResultSet res = this.provider.execute("SELECT * FROM warehouseitem WHERE id="+requestId);
-		this.provider.execute("UPDATE product SET quantity = quantity - "+res.getString("quantity")+" WHERE id = "+res.getString("product_id"));
+		ArrayList<HashMap<String, String>> res = this.provider.execute("SELECT * FROM warehouseitem WHERE id="+requestId).data();
+		
+		this.provider.execute("UPDATE product SET quantity = quantity - "+res.get(0).get("quantity")+" WHERE id = "+res.get(0).get("product_id"));
 		this.provider.execute("UPDATE warehouseitem SET status=1 WHERE id="+requestId);
 	}
 	
@@ -86,17 +87,20 @@ public class Dao {
 		this.provider.execute("UPDATE warehouseitem SET status=1 WHERE id="+requestId);
 	}
 	
-	public boolean checkLogin(String login,String pass) throws SQLException {
+	public boolean checkLogin(String login,String pass) {
 		
 		String passHash = Dao.md5Custom(pass);
-		ResultSet result = this.provider.execute("SELECT * FROM emloyee WHERE login='"+login+"' and pass = '"+passHash+"'");
 		
-		result.last();
-		if (result.getRow() > 0) {
-			return true;
-		} else {
-			return false;
+		try {
+			DaoResult result = this.provider.execute("SELECT * FROM employee WHERE login='"+login+"' and pass = '"+passHash+"'");
+			if (result.length() > 0) {
+				return true;
+			} 
+		} catch (Exception e) {
+			System.out.println("Error:"+e.getLocalizedMessage());
 		}
+		return false;
+		
 	}
 	
 	/**

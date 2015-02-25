@@ -13,6 +13,7 @@ import javax.swing.JPasswordField;
 import javax.swing.JLabel;
 
 import java.awt.Font;
+import java.sql.SQLException;
 
 import javax.swing.DefaultListModel;
 import javax.swing.SwingConstants;
@@ -21,6 +22,10 @@ import javax.swing.JSpinner;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
 import javax.swing.JComboBox;
+
+import com.naukma.shop.database.Dao;
+import com.naukma.shop.database.DaoResult;
+import com.naukma.shop.database.MySQLProvider;
 
 
 public class LogInView extends Panel {
@@ -77,6 +82,25 @@ public class LogInView extends Panel {
 		lblGreeting.setFont(new Font("Tahoma", Font.PLAIN, 26));
 		lblGreeting.setBounds(200, 61, 200, 96);
 		add(lblGreeting);
+		
+		this.btnLogIn.addActionListener(new ActionListener() {
+ 
+            public void actionPerformed(ActionEvent e)
+            {
+                Dao db = new Dao(new MySQLProvider());
+                DaoResult rs = db.getDepartments();
+                
+                System.out.println("count departments ="+ rs.length());
+                
+				boolean result = db.checkLogin(LogInView.this.getTextFieldLogin().getText(), new String(LogInView.this.getTextFieldPswd().getPassword()));
+				if (!result) {
+					System.out.println("Login error");
+				} else {
+					System.out.println("Login succeed");
+				}
+				
+            }
+        });
 		
 	}
 
