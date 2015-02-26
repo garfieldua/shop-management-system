@@ -14,6 +14,10 @@ public class Department extends DaoObject {
 		super(i);
 	}
 
+	public Department() {
+		super();
+	}
+
 	
 	
 }

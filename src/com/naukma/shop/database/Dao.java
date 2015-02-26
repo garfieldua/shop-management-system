@@ -10,11 +10,6 @@ import java.util.Vector;
 
 import com.naukma.shop.database.Objects.*;
 
-/**
- * This is only a template
- * @author Serho
- *
- */
 public class Dao {
 
 	private AbstractDataProvider provider;
@@ -26,17 +21,13 @@ public class Dao {
 		this.provider = dataprovider;
 	}
 
+	
+	
 
 	// #21 Створити SQL запити для перегляду інформації про товар 
+	// can be changed by new Product(id);
 	public Product getProductInfo(int id) throws Exception {
 		return new Product(id);
-	} 
-
-	// id shouldn't be provided - id is a primary key and auto increment. 
-	// if we need specified productId then we need to add another columnt to table 
-	// can return id of the created element
-	public void addNewProduct(String title,String description,String origin,int department,int quantity,int supplierId) {
-		this.provider.execute("INSERT INTO product set title='"+title+"', description = '"+description+"', origin = '"+origin+"', department_id = '"+department+"'");
 	} 
 
 	// #14 Створити SQL запити для фіксації надходження товарів
@@ -58,24 +49,8 @@ public class Dao {
 
 
 	//#15 Створити SQL запити для перегляду списку постачальників
-	public Vector<Supplier> getSuppliers() {
-
-		Vector<Supplier> result = new Vector<Supplier>();
-
-		DaoResult data =  this.provider.execute("SELECT * FROM supplier");
-
-		for (HashMap<String,String> row : data.data()) {
-
-			Supplier suplier = new Supplier();
-
-			suplier.id  = Integer.parseInt(row.get("id"));
-			// and so on with all columns
-
-			result.add(suplier);
-		}
-
-		return result;
-
+	public Vector<Supplier> getSuppliers() throws DaoObjectException {
+		return this.provider.execute("SELECT * FROM supplier").parseObjects(new Supplier());
 	} 
 
 	// #24 Створити SQL запити для оформлення замовлення на товари #24
@@ -88,27 +63,14 @@ public class Dao {
 	} 
 
 	// get requests for products
-	public Vector<Warehouseitem> getProductRequests() {		
-		Vector<Warehouseitem> result = new Vector<Warehouseitem>();
-		DaoResult data =  this.provider.execute("SELECT * FROM warehouseitem WHERE status=0");
-
-		for (HashMap<String,String> row : data.data()) {
-
-			Warehouseitem it = new Warehouseitem();
-
-			it.id  = Integer.parseInt(row.get("id"));
-			// and so on with all columns
-
-			result.add(it);
-		}
-
-		return result;
+	public Vector<Warehouseitem> getProductRequests() throws DaoObjectException {		
+		return this.provider.execute("SELECT * FROM warehouseitem WHERE status=0").parseObjects(new Warehouseitem());
 	} 
 	// approve request
-	public void approveProductRequest(int requestId) throws SQLException {	
-		ArrayList<HashMap<String, String>> res = this.provider.execute("SELECT * FROM warehouseitem WHERE id="+requestId).data();
+	public void approveProductRequest(int requestId) throws DaoObjectException {	
+		Vector<Warehouseitem> res = this.provider.execute("SELECT * FROM warehouseitem WHERE id="+requestId).parseObjects(new Warehouseitem());
 
-		this.provider.execute("UPDATE product SET quantity = quantity - "+res.get(0).get("quantity")+" WHERE id = "+res.get(0).get("product_id"));
+		this.provider.execute("UPDATE product SET quantity = quantity - "+res.get(0).quantity+" WHERE id = "+res.get(0).productId);
 		this.provider.execute("UPDATE warehouseitem SET status=1 WHERE id="+requestId);
 	}
 

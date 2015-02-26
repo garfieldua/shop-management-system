@@ -1,6 +1,8 @@
 package com.naukma.shop.database.Objects;
 
-public class Supplier {
+import com.naukma.shop.database.DaoObject;
+
+public class Supplier extends DaoObject {
 
 	public int id;
 	

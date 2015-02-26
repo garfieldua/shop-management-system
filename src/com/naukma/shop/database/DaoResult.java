@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Vector;
 
 
 public class DaoResult {
@@ -50,6 +51,25 @@ public class DaoResult {
 	public ArrayList<HashMap<String,String>> data(){
 		return this.data;
 	}
+	
+	public <T extends DaoObject> Vector<T> parseObjects(T instance) throws DaoObjectException {
+		
+		Vector<T> result = new Vector<T>();
+		
+		if (this.count > 0) {
+			for (HashMap<String,String> row : this.data()) {
+				try {
+					T _obj = (T) instance.getClass().newInstance();
+					_obj.fill(row);
+					result.add(_obj);
+				} catch (Exception e) {
+					throw new DaoObjectException("Error while parsing objects");
+				}
+			}
+		} 
+		
+		return result;
+	} 
 
 
 
