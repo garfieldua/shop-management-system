@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.mysql.jdbc.PreparedStatement;
+
 public final class MySQLProvider extends AbstractDataProvider {
 	
 	private Connection con;
@@ -38,10 +40,14 @@ public final class MySQLProvider extends AbstractDataProvider {
 
 	public DaoResult execute(String query) {
 		try {
-			Statement s = con.createStatement();
+			java.sql.PreparedStatement s = con.prepareStatement(query,Statement.RETURN_GENERATED_KEYS);
 			
-			s.execute(query);
+			s.execute();
+			
 			ResultSet rs = s.getResultSet();
+			if (rs == null) {
+				rs = s.getGeneratedKeys();
+			}
 
 			return new DaoResult(rs);
 		}
