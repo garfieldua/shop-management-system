@@ -17,7 +17,7 @@ public class Tests {
 		
 		System.out.println("Count results = "+result.size()); 
 		System.out.println("user = "+result.get(1));  // whole array to console
-		System.out.println("Password of user = "+result.get(0).password);// get 'pass' column of row*/
+		System.out.println("Password of user = "+result.get(0).password);// get 'pass' column of row
 		
 		// single employee
 		Employee person = new Employee(3); // me

@@ -2,6 +2,7 @@ package com.naukma.shop.database;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
@@ -114,17 +115,29 @@ abstract public class DaoObject {
 	}
 
 	public String TableName() {
-		if (this._tableName == "") {
-			return this.getClass().getSimpleName().toLowerCase();
-		} 
+		
+		if (this._tableName.equals("")) {
+			if (this.getClass().isAnnotationPresent(Table.class)) {
+				this._tableName =  this.getClass().getAnnotation(Table.class).value();
+			} else {
+				this._tableName = this.getClass().getSimpleName().toLowerCase();
+			}
+		}
+		
 		return this._tableName;
 	}
 
+	/**
+	 * Excute only after parseFeildsInfo()
+	 * @return
+	 */
 	public String PrimaryKey() {
-		if (this._primaryKey == "") {
-			return DaoObject.DEFAULT_PRIMARY;
-		} 
-		return this._primaryKey;
+		
+		if (this._primaryKey.equals("")) {
+			this._primaryKey = DaoObject.DEFAULT_PRIMARY;
+		}
+		
+		return this._primaryKey; 
 	}
 
 	/**
@@ -157,7 +170,7 @@ abstract public class DaoObject {
 				}
 			} else if (this.ThrowOnFill()) {
 				throw new DaoObjectException("Trying to assign non exist field '"+f.getKey()+"'");
-			}
+			} 
 		}
 	}
 
@@ -187,7 +200,13 @@ abstract public class DaoObject {
 				if (Modifier.isPublic(m.getModifiers()) && !Modifier.isStatic(m.getModifiers())) {
 					String colName = m.getName();
 					if (m.isAnnotationPresent(Column.class)) {
-						colName = m.getAnnotation(Column.class).name();
+						Column colAnn = m.getAnnotation(Column.class);
+						if (!colAnn.name().equals("")) {
+							colName = colAnn.name(); 
+						}
+						if (colAnn.primary()){
+							this._primaryKey = colName;
+						}
 					}
 					FieldInfo info  = new FieldInfo();
 					info.name = m.getName();
@@ -207,12 +226,16 @@ abstract public class DaoObject {
 	
 	private void parseColumns() throws DaoObjectException {
 		try {
-			Field pKeyField = this.getClass().getField(this._primaryKey);
+			Field pKeyField = this.getClass().getField(this.PrimaryKey());
 			String sql = "SELECT * FROM "+this._tableName+" WHERE "+this._primaryKey+" = '"+pKeyField.get(this)+"'";
 			this.fill(db.executeRawQuery(sql).data().get(0));
 			this._isLoaded = true;
-		} catch (Exception e) {
-			throw new DaoObjectException(e.getMessage());
-		} 
+		} catch (NoSuchFieldException e) {
+			throw new DaoObjectException("Primary key not found or misconfirated");
+		} catch (SecurityException | IllegalArgumentException | IllegalAccessException e )  {
+			throw new DaoObjectException("Error parsing a data from database. Perhaps such data not exists");
+		} catch (IndexOutOfBoundsException e) {
+			throw new DaoObjectException("Error parsing a data from database. MySQl returned 0 rows");
+		} 		
 	}
 };
