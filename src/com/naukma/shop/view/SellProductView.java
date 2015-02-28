@@ -30,10 +30,6 @@ public class SellProductView extends PanelWithLogOut {
 	public SellProductView() {
 		getBtnLogOut().setLocation(500, 11);
 		
-		
-		
-		
-		
 		lblSuppliers = new JLabel("Sell Products");
 		lblSuppliers.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblSuppliers.setBounds(25, 15, 89, 30);
@@ -50,7 +46,9 @@ public class SellProductView extends PanelWithLogOut {
 		
 		textPaneItemsInfo = new JTextPane();
 		textPaneItemsInfo.setBounds(109, 191, 382, 125);
+		textPaneItemsInfo.setEditable(false);
 		add(textPaneItemsInfo);
+		
 		
 		lblQuantity = new JLabel("Quantity:");
 		lblQuantity.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -79,7 +77,6 @@ public class SellProductView extends PanelWithLogOut {
 		this.getBtnLogOut().addActionListener(l);
 		this.btnOk.addActionListener(l);
 		this.btnAllItems.addActionListener(l);
-	
 	}
 
 	public JComboBox getComboBox() {

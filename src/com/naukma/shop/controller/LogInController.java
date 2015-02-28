@@ -61,6 +61,9 @@ public class LogInController extends AbstractController {
 						else if (position.equals("storekeeper")) {
 							MainController.getInstance().setCurrentController(new StorekeeperController());
 						}
+						else if (position.equals("seller")) {
+							MainController.getInstance().setCurrentController(new SellerController());
+						}
 						
 					} catch (DaoObjectException e1) {
 						// TODO Auto-generated catch block
