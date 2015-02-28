@@ -46,6 +46,7 @@ public PanelWithLogOut() {
 	btnLogOut.setBounds(500, 15, 89, 30);
 	add(btnLogOut); 
 }
+
 public JButton getBtnLogOut() {
 	return btnLogOut;
 }

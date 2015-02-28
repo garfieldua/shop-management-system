@@ -16,6 +16,7 @@ public class ManagerView extends PanelWithLogOut{
 	private JLabel lblQuantity;
 	private JButton btnOk;
 	private JScrollPane scrollPane;
+	
 	public ManagerView() {
 		getBtnLogOut().setLocation(500, 11);
 		

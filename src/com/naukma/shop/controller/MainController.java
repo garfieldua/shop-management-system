@@ -2,15 +2,31 @@ package com.naukma.shop.controller;
 
 import javax.swing.JPanel;
 
-import com.naukma.shop.view.LogInView;
+import com.naukma.shop.database.Objects.Employee;
 import com.naukma.shop.view.MainContainer;
+import com.naukma.shop.view.PanelWithLogOut;
 
-public class MainController {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+
+public class MainController extends AbstractController {
+	// static controller
 	private static MainController instance = null;
+	
+	// current controller for main container
+	private AbstractController currentController = null;
+	
+	// main container
 	private final MainContainer main = new MainContainer();
 	
+	// current user
+	private Employee currentUser = null;
+	
+	
 	private MainController() {
-		this.setPanel(new LogInView());
 		main.setVisible(true);
 	}
 	
@@ -22,6 +38,32 @@ public class MainController {
 	}
 	
 	public void setPanel(JPanel panel) {
-		main.showPane(panel);
+		main.showPanel(panel);
+	}
+	
+	public void setCurrentController(AbstractController c) {
+		currentController = c;
+		c.assignToMainContrainer();
+	}
+	
+	public void setCurrentUser(Employee employee) {
+		currentUser = employee;
+	}
+	
+	public Employee getCurrentUser() {
+		return currentUser;
+	}
+	
+	public void addLogOutButtonListener(PanelWithLogOut view) {
+		view.getBtnLogOut().addActionListener(new ActionListener() {
+			@Override
+	        public void actionPerformed(ActionEvent e)
+	        {
+	        	System.out.println("want logout");
+	        	
+	        	setCurrentUser(null);
+	        	setCurrentController(new LogInController());
+	        }
+		});
 	}
 }

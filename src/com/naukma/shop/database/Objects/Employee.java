@@ -16,6 +16,8 @@ public class Employee extends DaoObject {
 	@Column(name = "first_name")
 	public String firstName;
 	
+	@Column(name = "position")
+	public String position;
 	
 	public Employee(int i) throws Exception {
 		super(i);

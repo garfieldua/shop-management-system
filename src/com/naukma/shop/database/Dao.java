@@ -24,13 +24,13 @@ public class Dao {
 	
 	
 
-	// #21 Створити SQL запити для перегляду інформації про товар 
+	// #21 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ 
 	// can be changed by new Product(id);
 	public Product getProductInfo(int id) throws Exception {
 		return new Product(id);
 	} 
 
-	// #14 Створити SQL запити для фіксації надходження товарів
+	// #14 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	public void fixAddProduct(int id,int supplierId,int quantity) {
 		this.provider.execute("UPDATE product SET quantity = quantity + "+quantity+" WHERE id = "+id);
 
@@ -39,7 +39,7 @@ public class Dao {
 
 	} 
 
-	// #17 Створити SQL запити для фіксації продажів  database
+	// #17 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ  database
 	public void fixBuyProduct(int id,int employeeId,int quantity) {
 		this.provider.execute("UPDATE product SET quantity = quantity - "+quantity+" WHERE id = "+id);
 
@@ -48,12 +48,20 @@ public class Dao {
 	} 
 
 
-	//#15 Створити SQL запити для перегляду списку постачальників
+	//#15 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 	public Vector<Supplier> getSuppliers() throws DaoObjectException {
 		return this.provider.execute("SELECT * FROM supplier").parseObjects(new Supplier());
 	} 
+	
+	
+	// get employee by employee
+	public Employee getEmployeeByName(String login) throws DaoObjectException {
+		Vector<Employee> vec = new Vector<Employee>(this.provider.execute("SELECT * FROM employee WHERE login='" + login + "'").parseObjects(new Employee()));
+		return vec.get(0);
+	}
+	
 
-	// #24 Створити SQL запити для оформлення замовлення на товари #24
+	// #24 пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ SQL пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ #24
 	public void requestForProduct(int id,int employeeId,int quantity) {
 
 		long timestamp = System.currentTimeMillis() / 1000L;

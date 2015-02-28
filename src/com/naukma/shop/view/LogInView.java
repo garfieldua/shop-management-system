@@ -82,23 +82,6 @@ public class LogInView extends Panel {
 		lblGreeting.setFont(new Font("Tahoma", Font.PLAIN, 26));
 		lblGreeting.setBounds(200, 61, 200, 96);
 		add(lblGreeting);
-		
-		this.btnLogIn.addActionListener(new ActionListener() {
- 
-            public void actionPerformed(ActionEvent e)
-            {
-                Dao db = new Dao(new MySQLProvider());
-                
-				boolean result = db.checkLogin(LogInView.this.getTextFieldLogin().getText(), new String(LogInView.this.getTextFieldPswd().getPassword()));
-				if (!result) {
-					System.out.println("Login error");
-				} else {
-					System.out.println("Login succeed");
-				}
-				
-            }
-        });
-		
 	}
 
 	public JButton getBtnLogIn() {
@@ -113,8 +96,26 @@ public class LogInView extends Panel {
 		return textFieldLogin;
 	}
 
+	/*
 	public void addListener(ActionListener l) {
 		btnLogIn.addActionListener(l);
-
 	}
+	*/
+	
+	/*
+	this.btnLogIn.addActionListener(new ActionListener() {
+
+        public void actionPerformed(ActionEvent e)
+        {
+            Dao db = new Dao(new MySQLProvider());
+            
+			boolean result = db.checkLogin(getTextFieldLogin().getText(), new String(getTextFieldPswd().getPassword()));
+			if (!result) {
+				System.out.println("Login error");
+			} else {
+				System.out.println("Login succeed");
+			}
+			
+        }
+    }); */
 }

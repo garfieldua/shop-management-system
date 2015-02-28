@@ -17,7 +17,7 @@ public class MainContainer extends JFrame {
 
 	}
 
-	public void showPane(JPanel p) {
+	public void showPanel(JPanel p) {
 		this.getContentPane().removeAll();
 		this.getContentPane().repaint();
 		this.getContentPane().revalidate();
