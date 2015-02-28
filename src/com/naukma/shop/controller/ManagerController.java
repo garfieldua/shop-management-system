@@ -10,7 +10,7 @@ public class ManagerController extends AbstractController {
 	}
 	
 	@Override
-	public void assignToMainContrainer() {
+	public void assignToMainContainer() {
 		MainController.getInstance().setPanel(view);
 		MainController.getInstance().addLogOutButtonListener(view);
 	}

@@ -38,7 +38,7 @@ public class SellerController extends AbstractController {
 	}
 	
 	@Override
-	public void assignToMainContrainer() {
+	public void assignToMainContainer() {
 		MainController.getInstance().setPanel(sellProductView);
 		MainController.getInstance().addLogOutButtonListener(sellProductView);
 	}

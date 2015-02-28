@@ -43,7 +43,7 @@ public class MainController extends AbstractController {
 	
 	public void setCurrentController(AbstractController c) {
 		currentController = c;
-		c.assignToMainContrainer();
+		c.assignToMainContainer();
 	}
 	
 	public void setCurrentUser(Employee employee) {

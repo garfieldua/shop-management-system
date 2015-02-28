@@ -76,7 +76,7 @@ public class LogInController extends AbstractController {
 	}
 	
 	@Override
-	public void assignToMainContrainer() {
+	public void assignToMainContainer() {
 		MainController.getInstance().setPanel(view);
 	}
 }
