@@ -12,6 +12,7 @@ abstract public class DaoObject {
 	class FieldInfo {
 		public String name;
 		public String type;
+		public boolean required; // is field required to save
 
 	}
 	private String _tableName = "";
@@ -82,7 +83,20 @@ abstract public class DaoObject {
 		boolean actualyLoaded = this._isLoaded;
 
 		if (this.FIELDS.size() > 0) {
+			
 			try {
+				
+				StringBuilder fieldsValues = new StringBuilder();
+				for (Entry<String, FieldInfo> f : this.FIELDS.entrySet()) {
+					Field field = this.getClass().getField(f.getValue().name);
+					Object value = field.get(this);
+					if (f.getValue().required && (value.toString().equals("") || value.toString().equals("0"))) {
+						throw new DaoObjectException("Not all required fields are filled");
+					}
+					sql.append("`"+f.getKey()+"` = '"+value+"',");
+				}
+				sql.deleteCharAt(sql.length()-1);
+				
 				Field pKeyField = this.getClass().getField(this._primaryKey);
 
 				if (!pKeyField.get(this).toString().equals("") && !pKeyField.get(this).toString().equals("0")) {
@@ -93,12 +107,7 @@ abstract public class DaoObject {
 				} else {
 					sql.append("INSERT INTO ");
 				}
-				sql.append(this._tableName+" SET ");
-				for (Entry<String, FieldInfo> f : this.FIELDS.entrySet()) {
-					Field field = this.getClass().getField(f.getValue().name);
-					sql.append("`"+f.getKey()+"` = '"+field.get(this)+"',");
-				}
-				sql.deleteCharAt(sql.length()-1);
+				sql.append(this._tableName+" SET "+fieldsValues);
 				if (this._isLoaded) {
 					sql.append(" WHERE "+this._primaryKey+" = '"+pKeyField.get(this)+"'");
 				}
@@ -106,9 +115,11 @@ abstract public class DaoObject {
 					int id = Integer.parseInt(db.executeRawQuery(sql.toString()).data().get(0).get("GENERATED_KEY"));
 					pKeyField.set(this,id);
 				}
+			} catch (DaoObjectException e) {
+				throw e;
 			} catch (Exception e) {
 				throw new DaoObjectException("DaoObject misconfiguration: please review column types");
-			}
+			} 
 		} else {
 			System.out.println("Nothing to save");
 		}
@@ -199,8 +210,10 @@ abstract public class DaoObject {
 			for (Field m : fields) {
 				if (Modifier.isPublic(m.getModifiers()) && !Modifier.isStatic(m.getModifiers())) {
 					String colName = m.getName();
+					FieldInfo info  = new FieldInfo();
 					if (m.isAnnotationPresent(Column.class)) {
 						Column colAnn = m.getAnnotation(Column.class);
+						info.required = colAnn.required();
 						if (!colAnn.name().equals("")) {
 							colName = colAnn.name(); 
 						}
@@ -208,9 +221,10 @@ abstract public class DaoObject {
 							this._primaryKey = colName;
 						}
 					}
-					FieldInfo info  = new FieldInfo();
+					
 					info.name = m.getName();
 					info.type = m.getType().getName();
+					
 					this.FIELDS.put(colName,info);
 				}
 			}
