@@ -9,8 +9,8 @@ import javax.swing.JOptionPane;
 import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Objects.Product;
+import com.naukma.shop.database.Objects.SuppliedItem;
 import com.naukma.shop.database.Objects.Supplier;
-
 import com.naukma.shop.utils.Strings;
 import com.naukma.shop.view.NewProductIncomeView;
 import com.naukma.shop.view.StorekeeperView;
@@ -54,8 +54,13 @@ public class StorekeeperController extends AbstractController {
 	        	int supplierId = ((Supplier)incomeView.getComboBoxSuppliers().getSelectedItem()).id;
 	        	int quantity = Integer.parseInt(incomeView.getTextFieldQuantity().getText());
 	        	
-	        	// fixing product income in DB
-	        	Dao.getInstance().fixAddProduct(productId, supplierId, quantity);
+	        	// we need to fixate product income in DB
+	        	SuppliedItem si = new SuppliedItem(productId, supplierId, quantity);
+	        	try {
+					si.save();
+				} catch (DaoObjectException e1) {
+					e1.printStackTrace();
+				}
 	        	
 	        	// informing user that everything is OK
 	        	JOptionPane.showMessageDialog(incomeView,

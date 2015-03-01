@@ -19,6 +19,12 @@ public class SuppliedItem extends DaoObject {
 	@Column(name="product_id",required = true) 
 	public int productId;
 
+	public SuppliedItem(int productId, int supplierId, int quantity) {
+		this.productId = productId;
+		this.supplierId = supplierId;
+		this.quantity = quantity;
+	}
+	
 	@Override
 	public void save() throws DaoObjectException {
 	 	

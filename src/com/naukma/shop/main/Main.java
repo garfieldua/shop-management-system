@@ -10,6 +10,5 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		MainController.getInstance().setCurrentController(new LogInController());
-		System.out.println(Strings.getProperty("ITEM_ADDED_TO_WAREHOUSE"));
 	}
 }
