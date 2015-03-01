@@ -4,6 +4,7 @@ import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.MySQLProvider;
 import com.naukma.shop.database.Objects.Employee;
+import com.naukma.shop.utils.Strings;
 import com.naukma.shop.view.LogInView;
 
 import java.awt.event.ActionListener;
@@ -43,8 +44,8 @@ public class LogInController extends AbstractController {
 					view.getTextFieldPswd().setText("");
 					
 					JOptionPane.showMessageDialog(view,
-			                   "User with such login or password doesn't exist",
-			                   "Error",
+			                   Strings.getProperty("LOGIN_FAILURE"),
+			                   Strings.getProperty("ERROR"),
 			                   JOptionPane.ERROR_MESSAGE);
 				} else {
 					//Login succeed

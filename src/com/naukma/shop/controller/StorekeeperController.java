@@ -11,6 +11,7 @@ import com.naukma.shop.database.DaoObject;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Objects.Product;
 import com.naukma.shop.database.Objects.Supplier;
+import com.naukma.shop.utils.Strings;
 import com.naukma.shop.view.NewProductIncomeView;
 import com.naukma.shop.view.StorekeeperView;
 
@@ -58,8 +59,8 @@ public class StorekeeperController extends AbstractController {
 	        	
 	        	// informing user that everything is OK
 	        	JOptionPane.showMessageDialog(incomeView,
-		                   "Item was successfully added to warehouse!",
-		                   "Success",
+		                   Strings.getProperty("ITEM_ADDED_TO_WAREHOUSE"),
+		                   Strings.getProperty("SUCCESS"),
 		                   JOptionPane.INFORMATION_MESSAGE);
 	        }
 		});
