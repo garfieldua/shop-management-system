@@ -8,6 +8,7 @@ public class Employee extends DaoObject {
 	@Column(primary = true)
 	public int id;
 	
+	@Column(name = "login")
 	public String login;
 	
 	@Column(name = "pass")

@@ -13,12 +13,13 @@ import javax.swing.JButton;
 public class NewProductIncomeView extends PanelWithLogOut{
 	
 	
-	private JTextField textField;
+	private JTextField textFieldQuantity;
 	private JLabel lblItem;
 	private JLabel lblSuppliers;
 	private JLabel lblQuantity;
 	private JLabel lblNewProductIncome;
 	private JButton btnAdd;
+	private JButton btnBack;
 	private JComboBox comboBoxItem;
 	private JComboBox comboBoxSuppliers;
 	
@@ -26,24 +27,27 @@ public class NewProductIncomeView extends PanelWithLogOut{
 		getBtnLogOut().setLocation(500, 15);
 		
 		comboBoxItem = new JComboBox();
+		comboBoxItem.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		comboBoxItem.setBounds(175, 150, 327, 30);
 		add(comboBoxItem);
 		
 		comboBoxSuppliers = new JComboBox();
+		comboBoxSuppliers.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		comboBoxSuppliers.setBounds(175, 220, 325, 30);
 		add(comboBoxSuppliers);
 		
-		textField = new JTextField();
-		textField.setBounds(175, 290, 325, 30);
-		add(textField);
-		textField.setColumns(10);
+		textFieldQuantity = new JTextField();
+		textFieldQuantity.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		textFieldQuantity.setBounds(175, 290, 325, 30);
+		add(textFieldQuantity);
+		textFieldQuantity.setColumns(10);
 		
 		lblItem = new JLabel("Item:");
 		lblItem.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblItem.setBounds(100, 144, 75, 40);
 		add(lblItem);
 		
-		lblSuppliers = new JLabel("Suppliers:");
+		lblSuppliers = new JLabel("Supplier:");
 		lblSuppliers.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		lblSuppliers.setBounds(100, 209, 75, 50);
 		add(lblSuppliers);
@@ -60,20 +64,32 @@ public class NewProductIncomeView extends PanelWithLogOut{
 		
 		btnAdd = new JButton("Add");
 		btnAdd.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		btnAdd.setBounds(250, 385, 100, 30);
+		btnAdd.setBounds(402, 342, 100, 30);
 		add(btnAdd);
+		
+		btnBack = new JButton("Back");
+		btnBack.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnBack.setBounds(100, 442, 117, 29);
+		add(btnBack);
 	}
+	
 	public JButton getBtnAdd() {
 		return btnAdd;
 	}
+	
+	public JButton getBtnBack() {
+		return btnBack;
+	}
+	
 	public JComboBox getComboBoxItem() {
 		return comboBoxItem;
 	}
+	
 	public JComboBox getComboBoxSuppliers() {
 		return comboBoxSuppliers;
 	}
-	public void addListener(ActionListener l) {
-		btnAdd.addActionListener(l);
-
+	
+	public JTextField getTextFieldQuantity() {
+		return textFieldQuantity;
 	}
 }
