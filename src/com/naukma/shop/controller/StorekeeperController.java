@@ -14,20 +14,31 @@ import com.naukma.shop.database.Objects.Supplier;
 import com.naukma.shop.utils.Strings;
 import com.naukma.shop.view.NewProductIncomeView;
 import com.naukma.shop.view.StorekeeperView;
+import com.naukma.shop.view.SuppliersView;
 
 public class StorekeeperController extends AbstractController {
 	private StorekeeperView storekeeperView; 
 	private NewProductIncomeView incomeView;
+	private SuppliersView suppliersView;
 
 	public StorekeeperController() {
 		storekeeperView = new StorekeeperView();
 		incomeView = new NewProductIncomeView();
+		suppliersView = new SuppliersView();
 		
 		// open view to register new product income
 		storekeeperView.getBtnNewProductIncome().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(incomeView);
 	        	prepareIncomeView();
+	        }
+		});
+		
+		// open view to show all suppliers
+		storekeeperView.getBtnViewSuppliers().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(suppliersView);
+	        	prepareSuppliersView();
 	        }
 		});
 	}
@@ -91,4 +102,34 @@ public class StorekeeperController extends AbstractController {
 		incomeView.getComboBoxSuppliers().removeAllItems();
 		incomeView.getTextFieldQuantity().setText("");
 	}
+	
+	private void prepareSuppliersView() {
+		suppliersView.getBtnBack().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(storekeeperView);
+	        	purgeSuppliersView();
+	        }
+		});
+		
+		try {
+			Vector<Supplier> suppliers = Dao.getInstance().getSuppliers();
+			
+			suppliersView.getModelSuppliers().addColumn("Name");
+			suppliersView.getModelSuppliers().addColumn("Phone");
+			
+			for (int i = 0; i < suppliers.size(); ++i) {
+				suppliersView.getModelSuppliers().addRow(new Object[]{suppliers.get(i).name, suppliers.get(i).phone});
+			}
+			
+		} catch (DaoObjectException e1) {
+			System.out.println("Exception in StorekeeperController::prepareSuppliersView" + e1.getMessage());
+		}
+	}
+	
+	private void purgeSuppliersView() {
+		suppliersView.getModelSuppliers().setRowCount(0);
+		suppliersView.getModelSuppliers().setColumnCount(0);
+	}
+	
 }
