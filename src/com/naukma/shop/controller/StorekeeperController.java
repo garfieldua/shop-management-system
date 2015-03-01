@@ -7,10 +7,10 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 
 import com.naukma.shop.database.Dao;
-import com.naukma.shop.database.DaoObject;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Objects.Product;
 import com.naukma.shop.database.Objects.Supplier;
+
 import com.naukma.shop.utils.Strings;
 import com.naukma.shop.view.NewProductIncomeView;
 import com.naukma.shop.view.StorekeeperView;
@@ -67,12 +67,12 @@ public class StorekeeperController extends AbstractController {
 		
 		// need to load all products and suppliers
 		try {
-			Vector<Supplier> suppliers = DaoObject.all(new Supplier());
+			Vector<Supplier> suppliers = Dao.getInstance().find(new Supplier());
 			for (int i = 0; i < suppliers.size(); ++i) {
 				incomeView.getComboBoxSuppliers().addItem(suppliers.get(i));
 			}
 			
-			Vector<Product> products = DaoObject.all(new Product());
+			Vector<Product> products = Dao.getInstance().find(new Product());
 			for (int i = 0; i < products.size(); ++i) {
 				incomeView.getComboBoxItem().addItem(products.get(i));
 			}

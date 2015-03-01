@@ -3,24 +3,46 @@ package com.naukma.shop.database;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 
 import com.naukma.shop.database.Objects.*;
 
 public class Dao {
-
+	
 	private AbstractDataProvider provider;
-
 	private static Dao instance = null;
-
-
+	private WhereClause _wherecomp = new WhereAllRows();
+	
 	public Dao(AbstractDataProvider dataprovider) {
 		this.provider = dataprovider;
 	}
-
+	
+	public Dao Where(WhereClause whereClause) {
+		this._wherecomp = whereClause;
+		return this;
+	}
+	
+	public <T extends DaoObject> Vector<T> find(T instance) throws DaoObjectException {
+		return this.find(instance,0);
+	}
+	public <T extends DaoObject> Vector<T> find(T instance,int limit) throws DaoObjectException {
+		Vector<T> result = new Vector<T>();
+		try {
+			StringBuilder sql = new StringBuilder("SELECT * FROM "+instance.TableName());
+			
+			if (limit > 0) {
+				sql.append(" LIMIT "+limit);
+			}
+			
+			result = this.executeRawQuery(sql.toString()).parseObjects(instance,this._wherecomp);
+		} catch (Exception e) {
+			throw new DaoObjectException(e.getMessage());
+		} 		
+		
+		this._wherecomp = new WhereAllRows(); // clear where clause
+		
+		return result;
+	} 
 	
 	
 

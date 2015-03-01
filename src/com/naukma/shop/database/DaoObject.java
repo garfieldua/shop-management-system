@@ -22,6 +22,8 @@ abstract public class DaoObject {
 	private final static String DEFAULT_PRIMARY = "id";
 	private HashMap<String,FieldInfo> FIELDS = new HashMap<String,FieldInfo>(); 
 	
+	
+	
 	public DaoObject(){
 		this.initialize();
 	}
@@ -38,25 +40,6 @@ abstract public class DaoObject {
 		this.initialize();
 		this.fill(data);
 	} 	
-	
-	public static <T extends DaoObject> Vector<T> all(T instance) throws DaoObjectException {
-		return DaoObject.all(instance,0);
-	}
-	public static <T extends DaoObject> Vector<T> all(T instance,int limit) throws DaoObjectException {
-		Vector<T> result = new Vector<T>();
-
-		try {
-			StringBuilder sql = new StringBuilder("SELECT * FROM "+instance.TableName());
-			if (limit > 0) {
-				sql.append(" LIMIT "+limit);
-			}
-			result = db.executeRawQuery(sql.toString()).parseObjects(instance);
-		} catch (Exception e) {
-			throw new DaoObjectException(e.getMessage());
-		} 		
-		
-		return result;
-	} 
 	
 	public void remove() throws DaoObjectException{
 		StringBuilder sql = new StringBuilder();
@@ -93,9 +76,9 @@ abstract public class DaoObject {
 					if (f.getValue().required && (value.toString().equals("") || value.toString().equals("0"))) {
 						throw new DaoObjectException("Not all required fields are filled");
 					}
-					sql.append("`"+f.getKey()+"` = '"+value+"',");
+					fieldsValues.append("`"+f.getKey()+"` = '"+value+"',");
 				}
-				sql.deleteCharAt(sql.length()-1);
+				fieldsValues.deleteCharAt(fieldsValues.length()-1);
 				
 				Field pKeyField = this.getClass().getField(this._primaryKey);
 

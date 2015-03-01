@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
-
 public class DaoResult {
 
 	private int count = 0;
@@ -53,6 +52,10 @@ public class DaoResult {
 	}
 	
 	public <T extends DaoObject> Vector<T> parseObjects(T instance) throws DaoObjectException {
+		return this.parseObjects(instance,new WhereAllRows());
+	} 
+	
+	public <T extends DaoObject> Vector<T> parseObjects(T instance,WhereClause comparator) throws DaoObjectException {
 		
 		Vector<T> result = new Vector<T>();
 		
@@ -61,7 +64,10 @@ public class DaoResult {
 				try {
 					T _obj = (T) instance.getClass().newInstance();
 					_obj.fill(row);
-					result.add(_obj);
+					
+					if (comparator.compare(_obj)) {
+						result.add(_obj);
+					}
 				} catch (Exception e) {
 					throw new DaoObjectException("Error while parsing objects");
 				}

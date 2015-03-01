@@ -17,7 +17,7 @@ public class Employee extends DaoObject {
 	@Column(name = "first_name")
 	public String firstName;
 	
-	@Column(name = "position")
+	@Column(name = "position", required = true)
 	public String position;
 	
 	public Employee(int i) throws Exception {
