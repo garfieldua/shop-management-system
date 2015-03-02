@@ -10,4 +10,8 @@ public class Warehouseitem extends DaoObject {
 	@Column(name = "product_id")
 	public int productId;
 	
+	public Warehouseitem(int id) throws DaoObjectException {
+		super(id);
+	}
+	
 }

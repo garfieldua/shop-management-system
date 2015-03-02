@@ -20,6 +20,9 @@ public class Employee extends DaoObject {
 	@Column(name = "position", required = true)
 	public String position;
 	
+	@Column(name = "department_id")
+	public int departmentId;
+	
 	public Employee(int i) throws Exception {
 		super(i);
 	}
