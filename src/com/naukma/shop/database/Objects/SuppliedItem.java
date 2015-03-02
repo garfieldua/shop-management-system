@@ -1,5 +1,7 @@
 package com.naukma.shop.database.Objects;
 
+import java.util.Date;
+
 import com.naukma.shop.database.*;
 
 @Table("supplied_item")
@@ -8,7 +10,7 @@ public class SuppliedItem extends DaoObject {
 	public int id;
 	
 	@Column(timestamp = true)
-	public int date;
+	public Date date;
 
 	@Column(required = true) 
 	public int quantity;

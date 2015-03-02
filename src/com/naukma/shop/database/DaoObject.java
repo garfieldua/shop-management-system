@@ -3,6 +3,7 @@ package com.naukma.shop.database;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
@@ -71,16 +72,25 @@ abstract public class DaoObject {
 				StringBuilder fieldsValues = new StringBuilder();
 				for (Entry<String, FieldInfo> f : this.FIELDS.entrySet()) {
 					Field field = this.getClass().getField(f.getValue().name);
+					String fieldType = field.getType().getSimpleName();
 					
 					if (f.getValue().timestamp) {
-						String fieldType = field.getType().getSimpleName();
-						if (!fieldType.equals("int")){
-							throw new DaoObjectException("Timestamp fields should be of type int."+fieldType+" given");
+						if (!fieldType.equals("java.util.Date")){
+							throw new DaoObjectException("Timestamp fields should be instance of java.util.Date."+fieldType+" given");
 						}
-						field.set(this, (int)(System.currentTimeMillis() / 1000L));
+						field.set(this, new Date(System.currentTimeMillis()));
 					}
 					
-					Object value = field.get(this);
+					Object value = null;
+					// switch case must be here
+					if (fieldType.equals("java.util.Date")) {
+						Date tmp = (Date)field.get(this);
+						value = tmp.getTime();
+					} else {
+						value = field.get(this);
+					}
+					
+					
 					if (f.getValue().required && (value.toString().equals("") || value.toString().equals("0"))) {
 						throw new DaoObjectException("Not all required fields are filled");
 					}
@@ -173,12 +183,17 @@ abstract public class DaoObject {
 						case "int": _fieldValue = Integer.parseInt(columnValue); break;
 						case "float": _fieldValue = Float.parseFloat(columnValue); break;
 						case "double": _fieldValue = Double.parseDouble(columnValue); break;
+						case "long": _fieldValue = Long.parseLong(columnValue); break;
 						case "java.lang.String": _fieldValue = columnValue; break;
+						case "java.util.Date" : _fieldValue = new Date(Long.parseLong(columnValue)); break;
 					}
+					
 					_field.set(this,_fieldValue);
+				} catch (NumberFormatException e){
+					throw new DaoObjectException("Error parsing '"+f.getKey()+"' column. Is type of column right in "+this.getClass().getSimpleName()+"?");
 				} catch (Exception e) {
 					throw new DaoObjectException("No field '"+f.getKey()+"' found while filling "+this.getClass().getSimpleName());
-				}
+				} 
 			} else if (this.ThrowOnFill()) {
 				throw new DaoObjectException("Trying to assign non exist field '"+f.getKey()+"'");
 			} 

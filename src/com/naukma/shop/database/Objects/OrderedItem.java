@@ -1,5 +1,7 @@
 package com.naukma.shop.database.Objects;
 
+import java.util.Date;
+
 import com.naukma.shop.database.Column;
 import com.naukma.shop.database.DaoObject;
 import com.naukma.shop.database.DaoObjectException;
@@ -11,7 +13,7 @@ public class OrderedItem extends DaoObject {
 	public int id;
 	
 	@Column(timestamp = true)
-	public int date;
+	public Date date;
 	
 	public int quantity;
 	

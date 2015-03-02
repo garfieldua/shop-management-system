@@ -1,5 +1,11 @@
 package com.naukma.shop.main;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import java.util.Vector;
 
 import com.naukma.shop.database.Dao;
@@ -7,14 +13,13 @@ import com.naukma.shop.database.DaoObject;
 import com.naukma.shop.database.WhereClause;
 
 import com.naukma.shop.database.Objects.*;
+import com.sun.jmx.snmp.Timestamp;
 
 
 
 public class Tests {
 	
 	public static void main(String[] args) throws Exception {
-		
-		
 		
 		// 10 last employees
 		Vector<Employee> result = Dao.getInstance().Where(new WhereClause<Employee>(){
@@ -48,15 +53,30 @@ public class Tests {
 		}
 		
 		
-		SoldItem sold = new SoldItem();
-		sold.productId = 21;
-		sold.supplierId = 12;
-		sold.quantity = 100;
-		sold.save();
+		/** 
+		 * Date in objects
+		 */
 		
-
+		GregorianCalendar d = new GregorianCalendar(2015, 2, 2);	 
+		d.set(Calendar.HOUR_OF_DAY,23);
+		d.set(Calendar.MINUTE,0);
+		d.set(Calendar.SECOND,0);
 		
+		final Date date = d.getTime();
 		
+		Vector<SoldItem> solditemsAfter =  Dao.getInstance().Where(new WhereClause<SoldItem>(){
+			public boolean compare(SoldItem row) {
+				return row.date.getTime() < date.getTime();
+			}
+			
+		}).find(new SoldItem());
+		
+		System.out.println("\nList of sold items after "+date+":");
+		for(SoldItem p: solditemsAfter) {
+			
+			Product pInfo = new Product(p.productId);
+			System.out.println("\t "+p.productId+" "+pInfo+" ["+p.quantity+"] "+p.date);
+		}
 		
 		
 	}
