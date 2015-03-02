@@ -6,6 +6,7 @@ import java.awt.Font;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
+import javax.swing.table.DefaultTableModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -15,6 +16,7 @@ public class AllItemsView extends PanelWithLogOut {
 	private JLabel lblAllItems;
 	private JScrollPane scrollPaneAllItems;
 	private JButton btnBackButton;
+	private DefaultTableModel modelAllItems;
 	
 	public AllItemsView() {
 		getBtnLogOut().setLocation(500, 11);
@@ -22,14 +24,17 @@ public class AllItemsView extends PanelWithLogOut {
 		lblAllItems = new JLabel("All Items");
 		lblAllItems.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblAllItems.setBounds(24, 16, 100, 25);
-		add(lblAllItems);
+		add(lblAllItems); 
 		
 		scrollPaneAllItems = new JScrollPane();
 		scrollPaneAllItems.setBounds(50, 100, 500, 312);
 		add(scrollPaneAllItems);
 		    
-		table = new JTable();
+		modelAllItems = new DefaultTableModel();
+		table = new JTable(modelAllItems);
+		table.setEnabled(false);
 		scrollPaneAllItems.setViewportView(table);
+		
 		
 		btnBackButton = new JButton("Back");
 		btnBackButton.setBounds(50, 431, 117, 29);
@@ -50,6 +55,10 @@ public class AllItemsView extends PanelWithLogOut {
 
 	public JButton getBtnBackButton() {
 		return btnBackButton;
+	}
+
+	public DefaultTableModel getModelAllItems() {
+		return modelAllItems;
 	}
 	
 }

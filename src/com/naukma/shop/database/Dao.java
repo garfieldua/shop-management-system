@@ -76,6 +76,13 @@ public class Dao {
 	} 
 	
 	
+	// get all products
+	/*
+	public Vector<Supplier> getSuppliers() throws DaoObjectException {
+		return this.provider.execute("SELECT * FROM supplier").parseObjects(new Supplier());
+	} 
+	*/
+	
 	// get employee by employee
 	public Employee getEmployeeByName(String login) throws DaoObjectException {
 		Vector<Employee> vec = new Vector<Employee>(this.provider.execute("SELECT * FROM employee WHERE login='" + login + "'").parseObjects(new Employee()));
