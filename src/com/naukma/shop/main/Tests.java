@@ -36,5 +36,12 @@ public class Tests {
 		System.out.println(one);
 		
 		
+		Vector<Product> lowQuantityProducts = Product.getWithLittleQuantity();
+		
+		System.out.println("\nProducts with litle amount(<"+Product.MIN_AT_WARHOUSE+") at warhouse("+lowQuantityProducts.size()+"):");
+		for(Product p: lowQuantityProducts) {
+			System.out.println("\t"+p+" ["+p.quantity+"]");
+		}
+		
 	}
 }

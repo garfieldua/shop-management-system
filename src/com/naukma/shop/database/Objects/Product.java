@@ -1,12 +1,17 @@
 package com.naukma.shop.database.Objects;
 
+import java.util.Vector;
+
 import com.naukma.shop.database.Column;
+import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObject;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Table;
 
 @Table("product")
 public class Product extends DaoObject {
+	
+	public static final int MIN_AT_WARHOUSE = 5;
 	
 	@Column(primary = true)
 	public int id;
@@ -44,5 +49,16 @@ public class Product extends DaoObject {
 	
 	public Product(int id) throws DaoObjectException {
 		super(id);
+	}
+	
+	public static Vector<Product> getWithLittleQuantity() {
+		Vector<Product> result = new Vector<Product>();
+		Product instance = new Product();
+		
+		try {
+			result = Dao.getInstance().executeRawQuery("SELECT * FROM "+instance.TableName()+" WHERE quantity < "+Product.MIN_AT_WARHOUSE).parseObjects(instance);
+		} catch (Exception e) {}
+		
+		return result;
 	}
 }
