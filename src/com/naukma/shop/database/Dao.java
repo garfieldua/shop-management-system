@@ -100,12 +100,13 @@ public class Dao {
 	} 
 
 	// get requests for products
-	public Vector<WarehouseItem> getProductRequests() throws DaoObjectException {		
-		return this.provider.execute("SELECT * FROM warehouseitem WHERE status=0").parseObjects(new WarehouseItem());
+
+	public Vector<Warehouseitem> getProductRequests() throws DaoObjectException {		
+		return this.provider.execute("SELECT * FROM warehouseitem WHERE status=0").parseObjects(new Warehouseitem());
 	} 
 	// approve request
 	public void approveProductRequest(int requestId) throws DaoObjectException {	
-		Vector<WarehouseItem> res = this.provider.execute("SELECT * FROM warehouseitem WHERE id="+requestId).parseObjects(new WarehouseItem());
+		Vector<Warehouseitem> res = this.provider.execute("SELECT * FROM warehouseitem WHERE id="+requestId).parseObjects(new Warehouseitem());
 
 		this.provider.execute("UPDATE product SET quantity = quantity - "+res.get(0).quantity+" WHERE id = "+res.get(0).productId);
 		this.provider.execute("UPDATE warehouseitem SET status=1 WHERE id="+requestId);

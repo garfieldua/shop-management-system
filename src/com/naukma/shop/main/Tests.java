@@ -14,6 +14,8 @@ public class Tests {
 	
 	public static void main(String[] args) throws Exception {
 		
+		
+		
 		// 10 last employees
 		Vector<Employee> result = Dao.getInstance().Where(new WhereClause<Employee>(){
 			public boolean compare(Employee row) {
@@ -29,19 +31,33 @@ public class Tests {
 		Employee person = new Employee(3); // me
 		System.out.println(person);
 		
-		// departments 
-		Vector<Department> depts = Dao.getInstance().find(new Department());
+		// suppliers 
 		
-		Department one = new Department(2);
-		System.out.println(one);
+		Vector<Supplier> suppliers = Dao.getInstance().find(new Supplier(),100);
 		
+		System.out.println("\n10 Suppliers list:");
+		for(Supplier s: suppliers) {
+			System.out.println("\t "+s.id+" "+s);
+		}
 		
 		Vector<Product> lowQuantityProducts = Product.getWithLittleQuantity();
 		
-		System.out.println("\nProducts with litle amount(<"+Product.MIN_AT_WARHOUSE+") at warhouse("+lowQuantityProducts.size()+"):");
+		System.out.println("\nProducts with litle amount at warhouse("+lowQuantityProducts.size()+"):");
 		for(Product p: lowQuantityProducts) {
-			System.out.println("\t"+p+" ["+p.quantity+"]");
+			System.out.println("\t "+p.id+" "+p+" ["+p.quantity+"]");
 		}
+		
+		
+		SoldItem sold = new SoldItem();
+		sold.productId = 21;
+		sold.supplierId = 12;
+		sold.quantity = 100;
+		sold.save();
+		
+
+		
+		
+		
 		
 	}
 }

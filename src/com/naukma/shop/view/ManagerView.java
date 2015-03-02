@@ -25,12 +25,16 @@ import javax.swing.JComboBox;
 
 public class ManagerView extends PanelWithLogOut{
 	
-
+	private JLabel lblManagerView;
 	private JButton btnOrderProducts;
 
 	public ManagerView() {
+		lblManagerView = new JLabel("Manager View");
+		lblManagerView.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		lblManagerView.setBounds(10, 5, 200, 50);
+		add(lblManagerView);
 		
-		btnOrderProducts = new JButton("Order products");
+		btnOrderProducts = new JButton("Order critical amount products");
 		btnOrderProducts.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnOrderProducts.setBounds(175, 137, 250, 25);
 		add(btnOrderProducts);

@@ -12,5 +12,6 @@ public @interface Column {
 	   boolean ai() default false; // autoincrement
 	   boolean primary() default false;
 	   boolean required() default false;
+	   boolean timestamp() default false;
 }
 

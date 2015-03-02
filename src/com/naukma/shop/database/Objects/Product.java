@@ -11,8 +11,6 @@ import com.naukma.shop.database.Table;
 @Table("product")
 public class Product extends DaoObject {
 	
-	public static final int MIN_AT_WARHOUSE = 5;
-	
 	@Column(primary = true)
 	public int id;
 	
@@ -56,7 +54,7 @@ public class Product extends DaoObject {
 		Product instance = new Product();
 		
 		try {
-			result = Dao.getInstance().executeRawQuery("SELECT * FROM "+instance.TableName()+" WHERE quantity < "+Product.MIN_AT_WARHOUSE).parseObjects(instance);
+			result = Dao.getInstance().executeRawQuery("SELECT * FROM "+instance.TableName()+" WHERE quantity < min_amount").parseObjects(instance);
 		} catch (Exception e) {}
 		
 		return result;

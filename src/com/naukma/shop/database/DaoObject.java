@@ -13,6 +13,7 @@ abstract public class DaoObject {
 		public String name;
 		public String type;
 		public boolean required; // is field required to save
+		public boolean timestamp; // field would be overwritten by current timestamp on save()
 
 	}
 	private String _tableName = "";
@@ -66,12 +67,19 @@ abstract public class DaoObject {
 		boolean actualyLoaded = this._isLoaded;
 
 		if (this.FIELDS.size() > 0) {
-			
 			try {
-				
 				StringBuilder fieldsValues = new StringBuilder();
 				for (Entry<String, FieldInfo> f : this.FIELDS.entrySet()) {
 					Field field = this.getClass().getField(f.getValue().name);
+					
+					if (f.getValue().timestamp) {
+						String fieldType = field.getType().getSimpleName();
+						if (!fieldType.equals("int")){
+							throw new DaoObjectException("Timestamp fields should be of type int."+fieldType+" given");
+						}
+						field.set(this, (int)(System.currentTimeMillis() / 1000L));
+					}
+					
 					Object value = field.get(this);
 					if (f.getValue().required && (value.toString().equals("") || value.toString().equals("0"))) {
 						throw new DaoObjectException("Not all required fields are filled");
@@ -85,17 +93,25 @@ abstract public class DaoObject {
 				if (!pKeyField.get(this).toString().equals("") && !pKeyField.get(this).toString().equals("0")) {
 					this._isLoaded = true;
 				}
+				
 				if (this._isLoaded) {
+					System.out.print("\n +updating");
 					sql.append("UPDATE ");
 				} else {
+					System.out.print("\n +inserting");
 					sql.append("INSERT INTO ");
 				}
 				sql.append(this._tableName+" SET "+fieldsValues);
 				if (this._isLoaded) {
 					sql.append(" WHERE "+this._primaryKey+" = '"+pKeyField.get(this)+"'");
 				}
+				
+				System.out.print(" SAVING "+this.getClass().getSimpleName()+" \n"+sql+"\n");
+				
+				DaoResult queryResult = db.executeRawQuery(sql.toString());
+				
 				if (!actualyLoaded) {
-					int id = Integer.parseInt(db.executeRawQuery(sql.toString()).data().get(0).get("GENERATED_KEY"));
+					int id = Integer.parseInt(queryResult.data().get(0).get("GENERATED_KEY"));
 					pKeyField.set(this,id);
 				}
 			} catch (DaoObjectException e) {
@@ -103,6 +119,7 @@ abstract public class DaoObject {
 			} catch (Exception e) {
 				throw new DaoObjectException("DaoObject misconfiguration: please review column types");
 			} 
+		
 		} else {
 			System.out.println("Nothing to save");
 		}
@@ -197,6 +214,7 @@ abstract public class DaoObject {
 					if (m.isAnnotationPresent(Column.class)) {
 						Column colAnn = m.getAnnotation(Column.class);
 						info.required = colAnn.required();
+						info.timestamp = colAnn.timestamp();
 						if (!colAnn.name().equals("")) {
 							colName = colAnn.name(); 
 						}

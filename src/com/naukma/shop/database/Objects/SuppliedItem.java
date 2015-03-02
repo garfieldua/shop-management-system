@@ -7,8 +7,9 @@ public class SuppliedItem extends DaoObject {
 	
 	public int id;
 	
+	@Column(timestamp = true)
 	public int date;
-	
+
 	@Column(required = true) 
 	public int quantity;
 	
@@ -26,8 +27,6 @@ public class SuppliedItem extends DaoObject {
 	
 	@Override
 	public void save() throws DaoObjectException {
-	 	
-	 	this.date = (int)(System.currentTimeMillis() / 1000L); // current timestamp
 		super.save();
 		
 		Product relatedProduct = new Product(this.productId);

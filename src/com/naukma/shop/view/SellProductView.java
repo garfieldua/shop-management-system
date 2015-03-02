@@ -22,6 +22,8 @@ public class SellProductView extends PanelWithLogOut {
 	private JLabel lblItem;
 	private JComboBox comboBox;
 	private JTextPane textPaneItemsInfo;
+
+
 	private JLabel lblQuantity;
 	private JButton btnOk;
 	private JButton btnAllItems;
@@ -83,23 +85,29 @@ public class SellProductView extends PanelWithLogOut {
 		return comboBox;
 	}
 
-	public void setComboBox(JComboBox comboBox) {
-		this.comboBox = comboBox;
-	}
-
 	public JButton getBtnOk() {
 		return btnOk;
-	}
-
-	public void setBtnOk(JButton btnOk) {
-		this.btnOk = btnOk;
 	}
 
 	public JButton getBtnAllItems() {
 		return btnAllItems;
 	}
 
-	public void setBtnAllItems(JButton btnAllItems) {
-		this.btnAllItems = btnAllItems;
+	public JLabel getLblItem() {
+		return lblItem;
 	}
+
+	public JTextPane getTextPaneItemsInfo() {
+		return textPaneItemsInfo;
+	}
+
+	public JLabel getLblQuantity() {
+		return lblQuantity;
+	}
+
+	public JTextField getTextFieldQuantity() {
+		return textFieldQuantity;
+	}
+
+
 }
