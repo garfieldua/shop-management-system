@@ -15,15 +15,15 @@ public class Tests {
 	public static void main(String[] args) throws Exception {
 		
 		// 10 last employees
-		Vector<Employee> result = Dao.getInstance().Where(new WhereClause<Employee>(){
-			public boolean compare(Employee row) {
-				return row.firstName.equals("Sergiy");
-			}
-		}).find(new Employee(),10);		
+//		Vector<Employee> result = Dao.getInstance().Where(new WhereClause<Employee>(){
+//			public boolean compare(Employee row) {
+//				return row.firstName.equals("Sergiy");
+//			}
+//		}).find(new Employee(),10);		
 		
-		System.out.println("Count results = "+result.size()); 
-		System.out.println("user = "+result.get(0));  // whole array to console
-		System.out.println("Password of user = "+result.get(0).password);// get 'pass' column of row
+//		System.out.println("Count results = "+result.size()); 
+//		System.out.println("user = "+result.get(0));  // whole array to console
+//		System.out.println("Password of user = "+result.get(0).password);// get 'pass' column of row
 		
 		// single employee
 		Employee person = new Employee(3); // me
@@ -38,7 +38,7 @@ public class Tests {
 		
 		Vector<Product> lowQuantityProducts = Product.getWithLittleQuantity();
 		
-		System.out.println("\nProducts with litle amount(<"+Product.MIN_AT_WARHOUSE+") at warhouse("+lowQuantityProducts.size()+"):");
+		System.out.println("\nProducts with litle amount at warhouse("+lowQuantityProducts.size()+"):");
 		for(Product p: lowQuantityProducts) {
 			System.out.println("\t"+p+" ["+p.quantity+"]");
 		}
