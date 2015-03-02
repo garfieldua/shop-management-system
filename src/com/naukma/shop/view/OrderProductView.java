@@ -1,11 +1,17 @@
 package com.naukma.shop.view;
 import javax.swing.JLabel;
+
 import java.awt.Font;
+
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 import javax.swing.JButton;
 import javax.swing.JTable;
 import javax.swing.JScrollPane;
+import javax.swing.table.DefaultTableModel;
+
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class OrderProductView extends PanelWithLogOut{
 	private JTextField textField;
@@ -14,14 +20,18 @@ public class OrderProductView extends PanelWithLogOut{
 	private JLabel lblItem;
 	private JComboBox comboBox;
 	private JLabel lblQuantity;
-	private JButton btnOk;
+	private JButton btnAdd;
+	private JButton btnBack;
+	private JButton btnPrint;
 	private JScrollPane scrollPane;
+	private DefaultTableModel modelOrder;
+	
 	public OrderProductView() {
 		getBtnLogOut().setLocation(500, 11);
 		
-		lblManager = new JLabel("Manager");
+		lblManager = new JLabel("Order product");
 		lblManager.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblManager.setBounds(26, 16, 73, 25);
+		lblManager.setBounds(26, 16, 154, 25);
 		add(lblManager);
 		
 		lblItem = new JLabel("Item");
@@ -43,19 +53,56 @@ public class OrderProductView extends PanelWithLogOut{
 		lblQuantity.setBounds(100, 147, 94, 25);
 		add(lblQuantity);
 		
-		btnOk = new JButton("Ok");
-		btnOk.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		btnOk.setBounds(436, 213, 64, 25);
-		add(btnOk);
+		btnAdd = new JButton("Order");
+		btnAdd.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnAdd.setBounds(412, 186, 89, 25);
+		add(btnAdd);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(100, 263, 400, 191);
+		scrollPane.setBounds(100, 222, 400, 212);
 		add(scrollPane);
 		
-		table = new JTable();
+		modelOrder = new DefaultTableModel();
+		table = new JTable(modelOrder);
+		table.setEnabled(false);
 		scrollPane.setViewportView(table);
+		
+		btnBack = new JButton("Back");
+		btnBack.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnBack.setBounds(100, 445, 117, 29);
+		add(btnBack);
+		
+		btnPrint = new JButton("Print order");
+		btnPrint.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnPrint.setBounds(383, 445, 117, 29);
+		add(btnPrint);
+	}
+
+	public JTextField getTextField() {
+		return textField;
+	}
+
+	public JTable getTable() {
+		return table;
+	}
+
+	public JComboBox getComboBox() {
+		return comboBox;
+	}
+
+	public JButton getBtnAdd() {
+		return btnAdd;
+	}
+
+	public JButton getBtnBack() {
+		return btnBack;
 	}
 	
-	
+	public JButton getBtnPrint() {
+		return btnPrint;
+	}
 
+	public DefaultTableModel getModelOrder() {
+		return modelOrder;
+	}
 }

@@ -113,7 +113,7 @@ public class StorekeeperController extends AbstractController {
 		});
 		
 		try {
-			Vector<Supplier> suppliers = Dao.getInstance().getSuppliers();
+			Vector<Supplier> suppliers = Dao.getInstance().find(new Supplier());
 			
 			suppliersView.getModelSuppliers().addColumn("Name");
 			suppliersView.getModelSuppliers().addColumn("Phone");
