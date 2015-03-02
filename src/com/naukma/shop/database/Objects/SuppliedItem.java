@@ -1,6 +1,5 @@
 package com.naukma.shop.database.Objects;
 
-import com.naukma.shop.database.Objects.*;
 import com.naukma.shop.database.*;
 
 @Table("supplied_item")

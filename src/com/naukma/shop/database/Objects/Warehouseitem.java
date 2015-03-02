@@ -2,7 +2,7 @@ package com.naukma.shop.database.Objects;
 
 import com.naukma.shop.database.*;
 
-public class Warehouseitem extends DaoObject {
+public class WarehouseItem extends DaoObject {
 	
 	public int id;
 	public int quantity;
