@@ -110,17 +110,12 @@ public class SellerController extends AbstractController {
 	        		if (quantity <= warehouse_quantity) {
 	        			// item count ok
 	        			
-	        			//warehouse change
-	        			p.quantity = warehouse_quantity - quantity;
-	        			p.save();
-	        			
 	        			//stats
 	        			SoldItem s = new SoldItem();
 	        			s.quantity = quantity;
 	        			s.productId = productId;
 	        			s.supplierId = MainController.getInstance().getCurrentUser().id;
 	        			// date!
-	        			
 	        			s.save();
 	        			
 	        			// ok, show dialog
@@ -128,6 +123,10 @@ public class SellerController extends AbstractController {
 	 		                   Strings.getProperty("ITEM_SOLD"),
 	 		                   Strings.getProperty("SUCCESS"),
 	 		                   JOptionPane.INFORMATION_MESSAGE);
+	    	        	
+	    	        	// need to load all products and suppliers
+	    	    		reloadProducts();
+	    	        	
 	    	        	
 	
 	        		} else {
@@ -142,28 +141,6 @@ public class SellerController extends AbstractController {
 	        	catch (Exception exc) {
 	        		exc.printStackTrace();
 	        	}
-	    
-	        	
-	        	
-	        	/*
-	        	int productId = ((Product)incomeView.getComboBoxItem().getSelectedItem()).id;
-	        	int supplierId = ((Supplier)incomeView.getComboBoxSuppliers().getSelectedItem()).id;
-	        	int quantity = Integer.parseInt(incomeView.getTextFieldQuantity().getText());
-	        	
-	        	// we need to fixate product income in DB
-	        	SuppliedItem si = new SuppliedItem(productId, supplierId, quantity);
-	        	try {
-					si.save();
-				} catch (DaoObjectException e1) {
-					e1.printStackTrace();
-				}
-	        	
-	        	// informing user that everything is OK
-	        	JOptionPane.showMessageDialog(incomeView,
-		                   Strings.getProperty("ITEM_ADDED_TO_WAREHOUSE"),
-		                   Strings.getProperty("SUCCESS"),
-		                   JOptionPane.INFORMATION_MESSAGE);
-		        */
 	        }
 		});
 		
@@ -195,7 +172,24 @@ public class SellerController extends AbstractController {
 		});
 		
 		// need to load all products and suppliers
+		reloadProducts();
+		
+	}
+	
+	public void reloadProducts() {
+		purgeSellerView();
+		
 		try {
+			// get
+			Vector<Product> products2 = Dao.getInstance().Where(new WhereClause<Product>(){
+				public boolean compare(Product row) {
+					return row.id == 1;
+				}
+			}).find(new Product());	
+			
+			System.out.println("reload " + products2.get(0).quantity);
+			
+			//
 			
 			Vector<Product> products = Dao.getInstance().Where(new WhereClause<Product>(){
 				public boolean compare(Product row) {
@@ -209,7 +203,6 @@ public class SellerController extends AbstractController {
 		} catch (DaoObjectException e) {
 			System.out.println("Exception in StorekeeperController::prepareIncomeView" + e.getMessage());
 		}	
-		
 	}
 	
 	private void purgeAllItemsView() {

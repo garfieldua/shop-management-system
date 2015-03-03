@@ -2,6 +2,7 @@ package com.naukma.shop.controller;
 
 import javax.swing.JPanel;
 
+import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.Objects.Employee;
 import com.naukma.shop.view.MainContainer;
 import com.naukma.shop.view.PanelWithLogOut;
@@ -27,6 +28,7 @@ public class MainController extends AbstractController {
 	
 	
 	private MainController() {
+		Dao.enableCache(false);
 		main.setVisible(true);
 	}
 	
