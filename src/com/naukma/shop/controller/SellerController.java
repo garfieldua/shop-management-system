@@ -110,24 +110,12 @@ public class SellerController extends AbstractController {
 	        		if (quantity <= warehouse_quantity) {
 	        			// item count ok
 	        			
-	        			System.out.println(p.quantity);
-	        			
-	        			//warehouse change
-	        			p.quantity = warehouse_quantity - quantity;
-	        			
-	        			System.out.println(p.quantity);
-	        			
-	        			p.save();
-	        			
-	        			System.out.println(p.quantity);
-	        			
 	        			//stats
 	        			SoldItem s = new SoldItem();
 	        			s.quantity = quantity;
 	        			s.productId = productId;
 	        			s.supplierId = MainController.getInstance().getCurrentUser().id;
 	        			// date!
-	        			
 	        			s.save();
 	        			
 	        			// ok, show dialog
@@ -192,6 +180,16 @@ public class SellerController extends AbstractController {
 		purgeSellerView();
 		
 		try {
+			// get
+			Vector<Product> products2 = Dao.getInstance().Where(new WhereClause<Product>(){
+				public boolean compare(Product row) {
+					return row.id == 1;
+				}
+			}).find(new Product());	
+			
+			System.out.println("reload " + products2.get(0).quantity);
+			
+			//
 			
 			Vector<Product> products = Dao.getInstance().Where(new WhereClause<Product>(){
 				public boolean compare(Product row) {
