@@ -9,9 +9,12 @@ import java.util.HashMap;
 import java.util.Vector;
 
 public class DaoResult {
-
+	
+	public boolean cached = false;
+	
 	private int count = 0;
-	private ArrayList<HashMap<String,String>> data = new ArrayList<HashMap<String,String>>();
+	
+	ArrayList<HashMap<String,String>> data = new ArrayList<HashMap<String,String>>();
 
 	public DaoResult(ResultSet raw) {
 		if (raw != null) {
@@ -47,6 +50,7 @@ public class DaoResult {
 	public int length(){ 
 		return this.count;
 	}
+	
 	public ArrayList<HashMap<String,String>> data(){
 		return this.data;
 	}

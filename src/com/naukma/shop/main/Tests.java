@@ -52,32 +52,39 @@ public class Tests {
 			System.out.println("\t "+p.id+" "+p+" ["+p.quantity+"]");
 		}
 		
-		
-		/** 
-		 * Date in objects
-		 */
-		
-		GregorianCalendar d = new GregorianCalendar(2015, 2, 2);	 
+	    GregorianCalendar d = new GregorianCalendar(2015, 2, 2);	 
 		d.set(Calendar.HOUR_OF_DAY,23);
 		d.set(Calendar.MINUTE,0);
 		d.set(Calendar.SECOND,0);
 		
-		final Date date = d.getTime();
-		
+		final Date barrier = d.getTime();
 		Vector<SoldItem> solditemsAfter =  Dao.getInstance().Where(new WhereClause<SoldItem>(){
 			public boolean compare(SoldItem row) {
-				return row.date.getTime() < date.getTime();
+				return row.date.getTime() > barrier.getTime();
 			}
-			
 		}).find(new SoldItem());
 		
-		System.out.println("\nList of sold items after "+date+":");
+		
+		long start = System.currentTimeMillis();
+		
+		System.out.println("\nList of sold items after "+barrier+":");
 		for(SoldItem p: solditemsAfter) {
-			
 			Product pInfo = new Product(p.productId);
 			System.out.println("\t "+p.productId+" "+pInfo+" ["+p.quantity+"] "+p.date);
 		}
 		
+		Dao.enableCache(false);
+		
+		long startCahce = System.currentTimeMillis();
+		
+		System.out.println("\nList of sold items after "+barrier+":");
+		for(SoldItem p: solditemsAfter) {
+			Product pInfo = new Product(p.productId);
+			System.out.println("\t "+p.productId+" "+pInfo+" ["+p.quantity+"] "+p.date);
+		}
+		
+		System.out.println("with caching done in "+ (startCahce - start)+" ms");
+		System.out.println("without caching done in "+ (System.currentTimeMillis() - start)+" ms");
 		
 	}
 }

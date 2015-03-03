@@ -8,6 +8,10 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Vector;
 
+import com.naukma.shop.database.Dao.CacheItem;
+
+import sun.tools.tree.ThisExpression;
+
 abstract public class DaoObject {
 
 	class FieldInfo {
@@ -17,14 +21,13 @@ abstract public class DaoObject {
 		public boolean timestamp; // field would be overwritten by current timestamp on save()
 
 	}
+	
 	private String _tableName = "";
 	private String _primaryKey = "";
 	private boolean _isLoaded = false;
 	private static Dao db = Dao.getInstance();
 	private final static String DEFAULT_PRIMARY = "id";
 	private HashMap<String,FieldInfo> FIELDS = new HashMap<String,FieldInfo>(); 
-	
-	
 	
 	public DaoObject(){
 		this.initialize();
@@ -47,13 +50,33 @@ abstract public class DaoObject {
 		StringBuilder sql = new StringBuilder();
 		try {
 			Field pKeyField = this.getClass().getField(this._primaryKey);
-
-			if (!pKeyField.get(this).toString().equals("") && !pKeyField.get(this).toString().equals("0")) {
+			Object pKeyVal = pKeyField.get(this);
+			
+			if (!pKeyVal.toString().equals("") && !pKeyVal.toString().equals("0")) {
 				this._isLoaded = true;
 			}
 			if (this._isLoaded) {
-				sql.append("DELETE FROM "+this._tableName+" WHERE "+this._primaryKey+" = '"+pKeyField.get(this)+"'");
+				sql.append("DELETE FROM "+this._tableName+" WHERE "+this._primaryKey+" = '"+pKeyVal+"'");
+				
+				int _oldLifetime = Dao.cacheLifetime;
+				Dao.cacheLifetime = 2;
 				db.executeRawQuery(sql.toString());
+				Dao.cacheLifetime = _oldLifetime;
+				
+				if (Dao.useCache) {
+					if (Dao.cachedTables.containsKey(this.TableName())) {
+						CacheItem _cache = Dao.cache.get(Dao.cachedTables.get(this.TableName()));
+						
+						String primary = pKeyVal.toString();
+						for (int k =0; k < _cache.data.data.size(); k++) {
+							if (primary == _cache.data.data.get(k).get(this._primaryKey)) {
+								_cache.data.data.remove(k);
+								break;
+							}
+						}
+					}
+				}
+				
 				pKeyField.set(this,0);
 			} else {
 				throw new DaoObjectException("Can't delete unloaded objects!");
@@ -66,14 +89,18 @@ abstract public class DaoObject {
 	public void save() throws DaoObjectException {
 		StringBuilder sql = new StringBuilder();
 		boolean actualyLoaded = this._isLoaded;
+		boolean isNew = false;
 
+		HashMap<String,String> _forCache = new HashMap<String,String>();
+		
 		if (this.FIELDS.size() > 0) {
 			try {
 				StringBuilder fieldsValues = new StringBuilder();
+				
 				for (Entry<String, FieldInfo> f : this.FIELDS.entrySet()) {
 					Field field = this.getClass().getField(f.getValue().name);
-					String fieldType = field.getType().getSimpleName();
-					
+					String fieldType = field.getType().getCanonicalName();
+									
 					if (f.getValue().timestamp) {
 						if (!fieldType.equals("java.util.Date")){
 							throw new DaoObjectException("Timestamp fields should be instance of java.util.Date."+fieldType+" given");
@@ -94,40 +121,66 @@ abstract public class DaoObject {
 					if (f.getValue().required && (value.toString().equals("") || value.toString().equals("0"))) {
 						throw new DaoObjectException("Not all required fields are filled");
 					}
+					
+					if (Dao.useCache) {
+						_forCache.put(f.getKey(), value.toString());
+					}
+					
 					fieldsValues.append("`"+f.getKey()+"` = '"+value+"',");
 				}
 				fieldsValues.deleteCharAt(fieldsValues.length()-1);
 				
 				Field pKeyField = this.getClass().getField(this._primaryKey);
+				Object pKeyVal = pKeyField.get(this);
 
-				if (!pKeyField.get(this).toString().equals("") && !pKeyField.get(this).toString().equals("0")) {
+				if (!pKeyVal.toString().equals("") && !pKeyVal.toString().equals("0")) {
 					this._isLoaded = true;
 				}
 				
 				if (this._isLoaded) {
-					System.out.print("\n +updating");
 					sql.append("UPDATE ");
 				} else {
-					System.out.print("\n +inserting");
 					sql.append("INSERT INTO ");
+					isNew = true;
 				}
 				sql.append(this._tableName+" SET "+fieldsValues);
 				if (this._isLoaded) {
 					sql.append(" WHERE "+this._primaryKey+" = '"+pKeyField.get(this)+"'");
 				}
 				
-				System.out.print(" SAVING "+this.getClass().getSimpleName()+" \n"+sql+"\n");
-				
+				int _oldLifetime = Dao.cacheLifetime;
+				Dao.cacheLifetime = 2;
 				DaoResult queryResult = db.executeRawQuery(sql.toString());
+				Dao.cacheLifetime = _oldLifetime;
 				
-				if (!actualyLoaded) {
+				if (!actualyLoaded && !queryResult.cached) {
 					int id = Integer.parseInt(queryResult.data().get(0).get("GENERATED_KEY"));
 					pKeyField.set(this,id);
 				}
+				
+				if (Dao.useCache) {
+					if (Dao.cachedTables.containsKey(this.TableName())) {
+						CacheItem _cache = Dao.cache.get(Dao.cachedTables.get(this.TableName()));
+						if (isNew) {
+							_cache.data.data.add(_forCache);
+						} else {
+							String primary = pKeyVal.toString();
+							for (int k =0; k < _cache.data.data.size(); k++) {
+								if (primary == _cache.data.data.get(k).get(this._primaryKey)) {
+									_cache.data.data.set(k,_forCache);
+									break;
+								}
+							}
+						}
+						_cache.lifetime = Dao.cacheLifetime;
+						_cache.fetched = System.currentTimeMillis();
+					} 
+				}
+				
 			} catch (DaoObjectException e) {
 				throw e;
 			} catch (Exception e) {
-				throw new DaoObjectException("DaoObject misconfiguration: please review column types");
+				 e.printStackTrace(); //new DaoObjectException("DaoObject misconfiguration: please review column types:"+e.getLocalizedMessage());
 			} 
 		
 		} else {

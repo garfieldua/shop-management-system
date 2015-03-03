@@ -3,15 +3,52 @@ package com.naukma.shop.database;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import com.naukma.shop.database.Objects.*;
 
 public class Dao {
 	
+	class CacheItem {
+		
+		public int lifetime; // seconds
+		public long fetched; 
+		public DaoResult data;
+		
+		public CacheItem(){
+			
+		}
+		
+		public CacheItem(DaoResult data){
+			this.data = data;
+			this.fetched = System.currentTimeMillis();
+			this.lifetime = Dao.cacheLifetime;
+		}
+		
+	}	
+	
 	private AbstractDataProvider provider;
 	private static Dao instance = null;
 	private WhereClause _wherecomp = new WhereAllRows();
+	
+	static boolean useCache = true;
+	static int cacheLifetime = 1*30;
+	static HashMap<String,CacheItem> cache = new HashMap<String,CacheItem>();
+	static HashMap<String,String> cachedTables = new HashMap<String,String>();
+	
+	/*
+	public static void printCacheInfo() {
+		System.out.println("Dao cache dump ["+Dao.cache.size()+"]:");
+		
+		for (Entry<String, CacheItem> e: Dao.cache.entrySet()) {
+			System.out.println(e.getKey()+" ["+e.getValue().data.length()+" elements] fetched at "+new Date(e.getValue().fetched)+" for "+e.getValue().lifetime+"s.");
+		}
+		
+	}
+	*/
 	
 	public Dao(AbstractDataProvider dataprovider) {
 		this.provider = dataprovider;
@@ -29,9 +66,10 @@ public class Dao {
 		Vector<T> result = new Vector<T>();
 		try {
 			StringBuilder sql = new StringBuilder("SELECT * FROM "+instance.TableName());
-			
 			if (limit > 0) {
 				sql.append(" LIMIT "+limit);
+			} else if (Dao.useCache) {
+				Dao.cachedTables.put(instance.TableName(),Dao.md5Custom(sql.toString()));
 			}
 			
 			result = this.executeRawQuery(sql.toString()).parseObjects(instance,this._wherecomp);
@@ -44,6 +82,13 @@ public class Dao {
 		return result;
 	} 
 	
+	public static void setCacheLifetime(int seconds) {
+		Dao.cacheLifetime = seconds;
+	}
+	
+	public static void enableCache(boolean state) {
+		Dao.useCache = state;
+	}
 	
 
 	// #21 �������� SQL ������ ��� ��������� ���������� ��� ����� 
@@ -134,7 +179,29 @@ public class Dao {
 	}
 
 	public DaoResult executeRawQuery(String q){
-		return this.provider.execute(q);
+		DaoResult _data = null;
+		
+		if (this.useCache) {
+			String hash = Dao.md5Custom(q);
+			CacheItem _cache = null;
+			if (Dao.cache.containsKey(hash)) {
+				_cache = Dao.cache.get(hash);
+				String _typeSql = q.trim().substring(0,6).toLowerCase();
+				if (!_typeSql.equals("select")) {
+					System.out.println("Dao cache: Similar non-select ("+q+") query was executed "+(System.currentTimeMillis() - _cache.fetched)/1000L+". Is it not a bug?");
+				}
+			}
+			if (_cache != null && (System.currentTimeMillis() - _cache.fetched) < (long)_cache.lifetime*1000 ) {
+				_data = _cache.data;
+			} else {
+				_data = this.provider.execute(q);
+				_data.cached = true;
+				Dao.cache.put(hash, new CacheItem(_data));
+			}
+		} else {
+			_data = this.provider.execute(q);
+		}			
+		return _data;
 	}
 
 
@@ -170,5 +237,7 @@ public class Dao {
 		}
 		return instance;
 	}
+
+
 
 }
