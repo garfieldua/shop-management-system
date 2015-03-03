@@ -114,6 +114,9 @@ public class SellerController extends AbstractController {
 	        			
 	        			//warehouse change
 	        			p.quantity = warehouse_quantity - quantity;
+	        			
+	        			System.out.println(p.quantity);
+	        			
 	        			p.save();
 	        			
 	        			System.out.println(p.quantity);
