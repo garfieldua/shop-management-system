@@ -10,7 +10,7 @@ import java.util.Vector;
 
 import com.naukma.shop.database.Dao.CacheItem;
 
-import sun.tools.tree.ThisExpression;
+//import sun.tools.tree.ThisExpression;
 
 abstract public class DaoObject {
 
