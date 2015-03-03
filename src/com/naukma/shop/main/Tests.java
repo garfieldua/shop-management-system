@@ -22,11 +22,7 @@ public class Tests {
 	public static void main(String[] args) throws Exception {
 		
 		// 10 last employees
-		Vector<Employee> result = Dao.getInstance().Where(new WhereClause<Employee>(){
-			public boolean compare(Employee row) {
-				return row.firstName.equals("Sergiy");
-			}
-		}).find(new Employee(),10);		
+		Vector<Employee> result = Dao.getInstance().find(new Employee());		
 		
 		System.out.println("Count results = "+result.size()); 
 		System.out.println("user = "+result.get(0));  // whole array to console
@@ -67,6 +63,8 @@ public class Tests {
 		
 		long start = System.currentTimeMillis();
 		
+		Vector<Product> _pr = Dao.getInstance().find(new Product());
+		
 		System.out.println("\nList of sold items after "+barrier+":");
 		for(SoldItem p: solditemsAfter) {
 			Product pInfo = new Product(p.productId);
@@ -76,6 +74,7 @@ public class Tests {
 		Dao.enableCache(false);
 		
 		long startCahce = System.currentTimeMillis();
+		
 		
 		System.out.println("\nList of sold items after "+barrier+":");
 		for(SoldItem p: solditemsAfter) {

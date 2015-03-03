@@ -54,7 +54,11 @@ public class Product extends DaoObject {
 		Product instance = new Product();
 		
 		try {
+			int oldlt = Dao.cacheLifetime();
+			Dao.setCacheLifetime(2);
 			result = Dao.getInstance().executeRawQuery("SELECT * FROM "+instance.TableName()+" WHERE quantity < min_amount").parseObjects(instance);
+			Dao.setCacheLifetime(oldlt);
+			
 		} catch (Exception e) {}
 		
 		return result;

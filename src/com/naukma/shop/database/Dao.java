@@ -3,9 +3,7 @@ package com.naukma.shop.database;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Vector;
 
 import com.naukma.shop.database.Objects.*;
@@ -18,8 +16,10 @@ public class Dao {
 		public long fetched; 
 		public DaoResult data;
 		
-		public CacheItem(){
-			
+		public CacheItem(){}
+		
+		public boolean valid() {
+			return (System.currentTimeMillis() - this.fetched) < (long)this.lifetime*1000;
 		}
 		
 		public CacheItem(DaoResult data){
@@ -38,6 +38,8 @@ public class Dao {
 	static int cacheLifetime = 1*30;
 	static HashMap<String,CacheItem> cache = new HashMap<String,CacheItem>();
 	static HashMap<String,String> cachedTables = new HashMap<String,String>();
+	
+	
 	
 	/*
 	public static void printCacheInfo() {
@@ -81,6 +83,10 @@ public class Dao {
 		
 		return result;
 	} 
+	
+	public static int cacheLifetime() {
+		return Dao.cacheLifetime;
+	}
 	
 	public static void setCacheLifetime(int seconds) {
 		Dao.cacheLifetime = seconds;
@@ -181,7 +187,7 @@ public class Dao {
 	public DaoResult executeRawQuery(String q){
 		DaoResult _data = null;
 		
-		if (this.useCache) {
+		if (Dao.useCache) {
 			String hash = Dao.md5Custom(q);
 			CacheItem _cache = null;
 			if (Dao.cache.containsKey(hash)) {
@@ -191,7 +197,8 @@ public class Dao {
 					System.out.println("Dao cache: Similar non-select ("+q+") query was executed "+(System.currentTimeMillis() - _cache.fetched)/1000L+". Is it not a bug?");
 				}
 			}
-			if (_cache != null && (System.currentTimeMillis() - _cache.fetched) < (long)_cache.lifetime*1000 ) {
+			
+			if (_cache != null && _cache.valid()) {
 				_data = _cache.data;
 			} else {
 				_data = this.provider.execute(q);

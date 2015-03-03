@@ -32,13 +32,39 @@ abstract public class DaoObject {
 	public DaoObject(){
 		this.initialize();
 	}
-
+	
+	private void grabFromCache(CacheItem cache,int primary) throws DaoObjectException {
+		DaoObject _cache = cache.data._cacheParsed.get(primary);
+		if (_cache == null) {
+			throw new DaoObjectException("Cache error: no such item in cache. Try to disable caching");
+		}
+		for (Entry<String, FieldInfo> f: this.FIELDS.entrySet()) {
+			Field _field;
+			try {
+				_field = this.getClass().getField(f.getValue().name);
+				_field.set(this, _field.get(_cache));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public DaoObject(int primaryKey) throws DaoObjectException {
 		this.initialize();
-		HashMap<String,String> primary = new HashMap<String, String>();
-		primary.put(this.PrimaryKey(),String.valueOf(primaryKey));
-		this.fill(primary);
-		this.parseColumns();
+		
+		CacheItem _cache = null;
+		if (Dao.useCache && Dao.cachedTables.containsKey(this.TableName())) {
+			_cache = Dao.cache.get(Dao.cachedTables.get(this.TableName()));
+		}
+		
+		if (_cache != null && _cache.valid()) {
+			this.grabFromCache(_cache,primaryKey);
+		} else {
+			HashMap<String,String> primary = new HashMap<String, String>();
+			primary.put(this.PrimaryKey(),String.valueOf(primaryKey));
+			this.fill(primary);
+			this.parseColumns();
+		}
 	}
 
 	public DaoObject(HashMap<String,String> data) throws DaoObjectException {
@@ -289,11 +315,9 @@ abstract public class DaoObject {
 						if (colAnn.primary()){
 							this._primaryKey = colName;
 						}
-					}
-					
+					}	
 					info.name = m.getName();
 					info.type = m.getType().getName();
-					
 					this.FIELDS.put(colName,info);
 				}
 			}
