@@ -200,9 +200,9 @@ public class Dao {
 			
 			if (_cache != null && _cache.valid()) {
 				_data = _cache.data;
+				_data.cached = true;
 			} else {
 				_data = this.provider.execute(q);
-				_data.cached = true;
 				Dao.cache.put(hash, new CacheItem(_data));
 			}
 		} else {
