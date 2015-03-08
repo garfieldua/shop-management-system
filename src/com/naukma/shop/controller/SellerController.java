@@ -180,17 +180,6 @@ public class SellerController extends AbstractController {
 		purgeSellerView();
 		
 		try {
-			// get
-			Vector<Product> products2 = Dao.getInstance().Where(new WhereClause<Product>(){
-				public boolean compare(Product row) {
-					return row.id == 1;
-				}
-			}).find(new Product());	
-			
-			System.out.println("reload " + products2.get(0).quantity);
-			
-			//
-			
 			Vector<Product> products = Dao.getInstance().Where(new WhereClause<Product>(){
 				public boolean compare(Product row) {
 					return row.departmentId == MainController.getInstance().getCurrentUser().departmentId;
