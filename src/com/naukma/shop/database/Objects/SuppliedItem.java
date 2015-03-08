@@ -7,6 +7,7 @@ import com.naukma.shop.database.*;
 @Table("supplied_item")
 public class SuppliedItem extends DaoObject {
 	
+	@Column(primary = true)
 	public int id;
 	
 	@Column(timestamp = true)
@@ -25,6 +26,10 @@ public class SuppliedItem extends DaoObject {
 		this.productId = productId;
 		this.supplierId = supplierId;
 		this.quantity = quantity;
+	}
+	
+	public SuppliedItem(int id) throws DaoObjectException {
+		super(id);
 	}
 	
 	@Override
