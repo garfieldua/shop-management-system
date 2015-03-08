@@ -37,4 +37,14 @@ public class SoldItem extends DaoObject {
 		relatedProduct.quantity = relatedProduct.quantity - this.quantity;
 		relatedProduct.save();
 	}
+	
+	public SoldItem() {
+		super();
+	}
+	
+	public SoldItem(int id) throws DaoObjectException {
+		super(id);
+	}
+
+	
 }
