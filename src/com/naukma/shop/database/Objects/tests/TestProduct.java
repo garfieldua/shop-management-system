@@ -2,16 +2,26 @@ package com.naukma.shop.database.Objects.tests;
 
 import static org.junit.Assert.*;
 
+import java.util.Vector;
+
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Objects.Product;
 
 public class TestProduct {
 
 	Product product;
+	
+	
+	@BeforeClass
+	public static void disableCaching() {
+		Dao.enableCache(false);
+	}
 	
 	/**
 	 * Creating product, setting attributes for testing
@@ -23,7 +33,7 @@ public class TestProduct {
         product.title = "Test product";
         product.description = "Test purposed product";
         product.minAmount = 777;
-        product.quantity = 111;
+        product.quantity = 776;
         product.origin = "Moon";
         product.price = 123.45f;
         product.departmentId = 1;
@@ -55,6 +65,8 @@ public class TestProduct {
 		} catch (DaoObjectException e) {
 			e.printStackTrace();
 		}
+		
+		//comparing all fields
 		assertEquals(productDB.id, product.id);
 		assertEquals(productDB.title, product.title);
 		assertEquals(productDB.departmentId, product.departmentId);
@@ -67,4 +79,10 @@ public class TestProduct {
 		assertEquals(productDB.quantity, product.quantity);
 	}
 
+	@Test
+	public void testLittleQuantityProduct() {
+		Vector<Product> lowQuantityProducts = Product.getWithLittleQuantity();
+		
+		assertTrue(lowQuantityProducts.contains(product));
+	}
 }
