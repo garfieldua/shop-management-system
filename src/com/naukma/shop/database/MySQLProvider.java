@@ -7,15 +7,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import com.mysql.jdbc.PreparedStatement;
+import com.naukma.shop.utils.ConnectionConfig;
 
 public final class MySQLProvider extends AbstractDataProvider {
 	
 	private Connection con;
 	private static MySQLProvider instance = null;
 	
-	public static final String URL = "jdbc:mysql://37.140.192.17/u0044137_default";
-	public static final String USER = "u0044137_default";
-	public static final String PASSWORD = "hTrzP0p~tJB@";
+	public static final String URL = "jdbc:mysql:"+ConnectionConfig.getProperty("URL");
+	public static final String USER = ConnectionConfig.getProperty("USER");
+	public static final String PASSWORD = ConnectionConfig.getProperty("PASSWORD");
 	public static final String DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
 	public MySQLProvider() {

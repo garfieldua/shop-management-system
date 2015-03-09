@@ -2,10 +2,7 @@ package com.naukma.shop.database.Objects.tests;
 
 import static org.junit.Assert.*;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
