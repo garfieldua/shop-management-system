@@ -64,7 +64,7 @@ public class TestSuppliedItem {
 	@Test
 	public void testSuppliedItem() {
 		SuppliedItem suppliedDB = null;
-		System.out.println(suppliedItem.id);
+		
 		try {
 			suppliedDB = new SuppliedItem(suppliedItem.id);
 		} catch (DaoObjectException e) {
