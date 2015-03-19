@@ -103,17 +103,6 @@ public class ManagerView extends PanelWithLogOut{
 	public JButton getBtnOrderProducts() {
 		return btnOrderProducts;
 	}
-	
-	public void addListener(ActionListener l){
-		this.getBtnOrderProducts().addActionListener(l);
-		this.getBtnAddNewProduct().addActionListener(l);
-		this.getBtnReportOnSellers().addActionListener(l);
-		this.getBtnReportOnFinancial().addActionListener(l);
-		this.getBtnReportOnBalances().addActionListener(l);
-		this.getBtnReportOnSales().addActionListener(l);
-		this.getBtnAddNewSupplier().addActionListener(l);
-	
-	}
 }
 
 

@@ -7,27 +7,39 @@ import java.text.MessageFormat;
 import java.util.Vector;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Objects.OrderedItem;
 import com.naukma.shop.database.Objects.Product;
 import com.naukma.shop.database.Objects.Supplier;
+import com.naukma.shop.view.AddNewSupplierView;
 import com.naukma.shop.view.ManagerView;
 import com.naukma.shop.view.OrderProductView;
 import com.naukma.shop.utils.PrintPreview;
+import com.naukma.shop.utils.Strings;
 
 public class ManagerController extends AbstractController {
 	private ManagerView managerView;
 	private OrderProductView orderProductView;
+	private AddNewSupplierView addNewSupplierView;
 
 	public ManagerController() {
 		managerView = new ManagerView();
 		orderProductView = new OrderProductView();
+		addNewSupplierView = new AddNewSupplierView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(orderProductView);
 	        	prepareOrderProductView();
+	        }
+		});
+		
+		managerView.getBtnAddNewSupplier().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(addNewSupplierView);
+	        	prepareAddNewSupplierView();
 	        }
 		});
 	}
@@ -88,11 +100,55 @@ public class ManagerController extends AbstractController {
 		}
 	}
 	
+	private void prepareAddNewSupplierView() {
+		addNewSupplierView.getBtnBack().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	purgeAddNewSupplierView();
+	        }
+		});
+		
+		addNewSupplierView.getBtnAdd().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	String supplierName = addNewSupplierView.getTextFieldName().getText();
+	        	String supplierPhone = addNewSupplierView.getTextFieldPhone().getText();
+	        	
+	        	Supplier supplier = new Supplier();
+	        	supplier.name = supplierName;
+	        	supplier.phone = supplierPhone;
+	        	
+	        	try {
+					supplier.save();
+				} catch (DaoObjectException e1) {
+					e1.printStackTrace();
+				}
+	        	
+	        	JOptionPane.showMessageDialog(addNewSupplierView,
+		                   Strings.getProperty("SUPPLIER_ADDED"),
+		                   Strings.getProperty("SUCCESS"),
+		                   JOptionPane.INFORMATION_MESSAGE);
+	        	
+	        	purgeAddNewSupplierView();
+	        }
+		});
+	}
+	
 	private void purgeOrderProductView() {
 		orderProductView.getComboBox().removeAllItems();
 		orderProductView.getTextField().setText("");
 		orderProductView.getModelOrder().setColumnCount(0);
 		orderProductView.getModelOrder().setRowCount(0);
+	}
+	
+	private void purgeAddNewProductView() {
+		
+	}
+	
+	private void purgeAddNewSupplierView() {
+		addNewSupplierView.getTextFieldName().setText("");
+    	addNewSupplierView.getTextFieldPhone().setText("");
 	}
 	
 	@Override
