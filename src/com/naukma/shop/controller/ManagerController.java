@@ -9,10 +9,13 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
+import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
+import com.naukma.shop.database.Objects.Department;
 import com.naukma.shop.database.Objects.OrderedItem;
 import com.naukma.shop.database.Objects.Product;
 import com.naukma.shop.database.Objects.Supplier;
+import com.naukma.shop.view.AddNewProductView;
 import com.naukma.shop.view.AddNewSupplierView;
 import com.naukma.shop.view.ManagerView;
 import com.naukma.shop.view.OrderProductView;
@@ -23,11 +26,13 @@ public class ManagerController extends AbstractController {
 	private ManagerView managerView;
 	private OrderProductView orderProductView;
 	private AddNewSupplierView addNewSupplierView;
+	private AddNewProductView addNewProductView;
 
 	public ManagerController() {
 		managerView = new ManagerView();
 		orderProductView = new OrderProductView();
 		addNewSupplierView = new AddNewSupplierView();
+		addNewProductView = new AddNewProductView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
@@ -40,6 +45,13 @@ public class ManagerController extends AbstractController {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(addNewSupplierView);
 	        	prepareAddNewSupplierView();
+	        }
+		});
+		
+		managerView.getBtnAddNewProduct().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(addNewProductView);
+	        	prepareAddNewProductView();
 	        }
 		});
 	}
@@ -135,6 +147,61 @@ public class ManagerController extends AbstractController {
 		});
 	}
 	
+	private void prepareAddNewProductView() {
+		addNewProductView.getBtnBack().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	purgeAddNewProductView();
+	        	addNewProductView.getComboBox().removeAllItems();
+	        }
+		});
+		
+		addNewProductView.getBtnAdd().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	String productTitle = addNewProductView.getTextTitle().getText();
+	        	String productDescription = addNewProductView.getTextDescription().getText();
+	        	String productOrigin = addNewProductView.getTextOrigin().getText();
+	        	int productDepartmentId = ((Department)addNewProductView.getComboBox().getSelectedItem()).id;
+	        	System.out.println(addNewProductView.getTextPrice().getText());
+	        	float productPrice = Float.parseFloat(addNewProductView.getTextPrice().getText());
+	        	int productMinQuantity = Integer.parseInt(addNewProductView.getTextMinimalQuantity().getText());
+	        	
+	        	Product product = new Product();
+	        	product.title = productTitle;
+	        	product.description = productDescription;
+	        	product.origin = productOrigin;
+	        	product.departmentId = productDepartmentId;
+	        	product.price = productPrice;
+	        	product.minAmount = productMinQuantity;
+	        	
+	        	try {
+					product.save();
+				} catch (DaoObjectException e1) {
+					e1.printStackTrace();
+				}
+	        	
+	        	JOptionPane.showMessageDialog(addNewSupplierView,
+		                   Strings.getProperty("PRODUCT_ADDED"),
+		                   Strings.getProperty("SUCCESS"),
+		                   JOptionPane.INFORMATION_MESSAGE);
+	        	
+	        	purgeAddNewProductView();
+	        }
+		});
+		
+		// need to load all departments
+		try {
+			Vector<Department> departments = Dao.getInstance().find(new Department());
+			for (int i = 0; i < departments.size(); ++i) {
+				addNewProductView.getComboBox().addItem(departments.get(i));
+			}
+		} catch (DaoObjectException e) {
+			System.out.println("Exception in ManagerController::prepareAddNewProductView" + e.getMessage());
+		}
+	}
+	
 	private void purgeOrderProductView() {
 		orderProductView.getComboBox().removeAllItems();
 		orderProductView.getTextField().setText("");
@@ -143,7 +210,11 @@ public class ManagerController extends AbstractController {
 	}
 	
 	private void purgeAddNewProductView() {
-		
+		addNewProductView.getTextTitle().setText("");
+		addNewProductView.getTextDescription().setText("");
+		addNewProductView.getTextOrigin().setText("");
+		addNewProductView.getTextPrice().setText("");
+		addNewProductView.getTextMinimalQuantity().setText("");
 	}
 	
 	private void purgeAddNewSupplierView() {

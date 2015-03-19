@@ -4,7 +4,7 @@ import com.naukma.shop.database.*;
 
 public class Department extends DaoObject {
 	
-	@Column(name = "id")
+	@Column(primary = true)
 	public int id;
 	
 	@Column(name = "name")
@@ -18,6 +18,8 @@ public class Department extends DaoObject {
 		super();
 	}
 
-	
-	
+	@Override
+	public String toString() {
+		return name;
+	}
 }

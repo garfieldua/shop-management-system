@@ -16,11 +16,11 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 public class AddNewProductView extends PanelWithLogOut{
-	private JTextField text;
-	private JTextField textField;
-	private JTextField textField_1;
-	private JTextField textField_2;
-	private JTextField textField_3;
+	private JTextField textTitle;
+	private JTextField textDescription;
+	private JTextField textOrigin;
+	private JTextField textPrice;
+	private JTextField textMinimalQuantity;
 	private JLabel lblPrice;
 	private JLabel lblOrigin;
 	private JLabel lblMinimalQuantity;
@@ -30,6 +30,7 @@ public class AddNewProductView extends PanelWithLogOut{
 	private JLabel lblNewProduct;
 	private JLabel lblTitle;
 	private JLabel lblDescription;
+	private JButton btnBack;
 	
 	
 	public AddNewProductView() {
@@ -69,46 +70,82 @@ public class AddNewProductView extends PanelWithLogOut{
 		lblMinimalQuantity.setBounds(80, 325, 100, 25);
 		add(lblMinimalQuantity);
 		
-		text = new JTextField();
-		text.setBounds(245, 125, 250, 25);
-		add(text);
-		text.setColumns(10);
+		textTitle = new JTextField();
+		textTitle.setBounds(245, 125, 250, 25);
+		add(textTitle);
+		textTitle.setColumns(10);
 		
-		textField = new JTextField();
-		textField.setBounds(245, 165, 250, 25);
-		add(textField);
-		textField.setColumns(10);
+		textDescription = new JTextField();
+		textDescription.setBounds(245, 165, 250, 25);
+		add(textDescription);
+		textDescription.setColumns(10);
 		
-		textField_1 = new JTextField();
-		textField_1.setBounds(245, 205, 250, 25);
-		add(textField_1);
-		textField_1.setColumns(10);
+		textOrigin = new JTextField();
+		textOrigin.setBounds(245, 205, 250, 25);
+		add(textOrigin);
+		textOrigin.setColumns(10);
 		
 		comboBox = new JComboBox();
 		comboBox.setBounds(245, 245, 250, 25);
 		add(comboBox);
 		
-		textField_2 = new JTextField();
-		textField_2.setBounds(245, 285, 250, 25);
-		add(textField_2);
-		textField_2.setColumns(10);
+		textPrice = new JTextField();
+		textPrice.setBounds(245, 285, 250, 25);
+		add(textPrice);
+		textPrice.setColumns(10);
 		
-		textField_3 = new JTextField();
-		textField_3.setBounds(245, 325, 250, 25);
-		add(textField_3);
-		textField_3.setColumns(10);
+		textMinimalQuantity = new JTextField();
+		textMinimalQuantity.setBounds(245, 325, 250, 25);
+		add(textMinimalQuantity);
+		textMinimalQuantity.setColumns(10);
 		
 		btnAdd = new JButton("Add");
 		btnAdd.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnAdd.setBounds(450, 411, 100, 25);
 		add(btnAdd);
+		
+		btnBack = new JButton("Back");
+		btnBack.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnBack.setBounds(64, 413, 116, 25);
+		add(btnBack);
 	}
-
 
 	public JButton getBtnAdd() {
 		return btnAdd;
 	}
-	public void addListener(ActionListener l){
-		this.btnAdd.addActionListener(l);
+
+
+	public JTextField getTextTitle() {
+		return textTitle;
+	}
+
+
+	public JTextField getTextDescription() {
+		return textDescription;
+	}
+
+
+	public JTextField getTextOrigin() {
+		return textOrigin;
+	}
+
+
+	public JTextField getTextPrice() {
+		return textPrice;
+	}
+
+
+	public JTextField getTextMinimalQuantity() {
+		return textMinimalQuantity;
+	}
+
+
+	public JComboBox getComboBox() {
+		return comboBox;
+	}
+
+
+	public JButton getBtnBack() {
+		return btnBack;
 	}
 }
