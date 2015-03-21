@@ -3,6 +3,7 @@ package com.naukma.shop.controller;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.print.PrinterJob;
+import java.util.Date;
 import java.text.MessageFormat;
 import java.util.Vector;
 
@@ -19,6 +20,7 @@ import com.naukma.shop.view.AddNewProductView;
 import com.naukma.shop.view.AddNewSupplierView;
 import com.naukma.shop.view.ManagerView;
 import com.naukma.shop.view.OrderProductView;
+import com.naukma.shop.view.ReportOnFinancialResultsView;
 import com.naukma.shop.utils.PrintPreview;
 import com.naukma.shop.utils.Strings;
 
@@ -27,12 +29,14 @@ public class ManagerController extends AbstractController {
 	private OrderProductView orderProductView;
 	private AddNewSupplierView addNewSupplierView;
 	private AddNewProductView addNewProductView;
+	private ReportOnFinancialResultsView reportOnFinancialResultsView;
 
 	public ManagerController() {
 		managerView = new ManagerView();
 		orderProductView = new OrderProductView();
 		addNewSupplierView = new AddNewSupplierView();
 		addNewProductView = new AddNewProductView();
+		reportOnFinancialResultsView = new ReportOnFinancialResultsView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
@@ -52,6 +56,13 @@ public class ManagerController extends AbstractController {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(addNewProductView);
 	        	prepareAddNewProductView();
+	        }
+		});
+		
+		managerView.getBtnReportOnFinancial().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(reportOnFinancialResultsView);
+	        	prepareReportOnFinancialResultsView();
 	        }
 		});
 	}
@@ -202,6 +213,45 @@ public class ManagerController extends AbstractController {
 		}
 	}
 	
+	private void prepareReportOnFinancialResultsView() {
+		reportOnFinancialResultsView.getBtnClose().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	purgeReportOnFinancialResultsView();
+	        }
+		});
+		
+		reportOnFinancialResultsView.getBtnReport().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	purgeReportOnFinancialResultsView();
+	        	
+	        	Date startDate = reportOnFinancialResultsView.getDateFrom().getDate();
+	        	Date endDate = reportOnFinancialResultsView.getDateTo().getDate();
+	        	
+	        	java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
+	        	java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+	        	
+	        	reportOnFinancialResultsView.getTextField().setText(
+	        			"==== FINANCIAL REPORT ===="
+	        			+ "\nDepartment: " + reportOnFinancialResultsView.getComboBox().getSelectedItem()
+	        			+ "\nStart date: " + sqlStartDate
+	        			+ "\nEnd date: " + sqlEndDate);
+	        }
+		});
+		
+		// need to load all departments
+		try {
+			Vector<Department> departments = Dao.getInstance().find(new Department());
+			for (int i = 0; i < departments.size(); ++i) {
+				reportOnFinancialResultsView.getComboBox().addItem(departments.get(i));
+			}
+		} catch (DaoObjectException e) {
+			System.out.println("Exception in ManagerController::prepareReportOnFinancialResultsView" + e.getMessage());
+		}
+	}
+	
 	private void purgeOrderProductView() {
 		orderProductView.getComboBox().removeAllItems();
 		orderProductView.getTextField().setText("");
@@ -220,6 +270,10 @@ public class ManagerController extends AbstractController {
 	private void purgeAddNewSupplierView() {
 		addNewSupplierView.getTextFieldName().setText("");
     	addNewSupplierView.getTextFieldPhone().setText("");
+	}
+	
+	private void purgeReportOnFinancialResultsView() {
+		reportOnFinancialResultsView.getTextField().setText("");
 	}
 	
 	@Override
