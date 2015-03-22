@@ -115,6 +115,7 @@ public class SellerController extends AbstractController {
 	        			s.quantity = quantity;
 	        			s.productId = productId;
 	        			s.supplierId = MainController.getInstance().getCurrentUser().id;
+	        			s.totalPrice = p.price * quantity;
 	        			// date!
 	        			s.save();
 	        			

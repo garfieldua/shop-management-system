@@ -21,6 +21,9 @@ public class SoldItem extends DaoObject {
 	@Column(timestamp = true)
 	public Date date;
 	
+	@Column(name = "total_price")
+	public float totalPrice;
+	
 	public void save() throws DaoObjectException {
 		
 		Product relatedProduct = null;
