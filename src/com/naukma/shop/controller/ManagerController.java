@@ -20,11 +20,13 @@ import com.naukma.shop.database.Objects.OrderedItem;
 import com.naukma.shop.database.Objects.Product;
 import com.naukma.shop.database.Objects.SoldItem;
 import com.naukma.shop.database.Objects.Supplier;
+import com.naukma.shop.database.Objects.extras.MonthSalesCount;
 import com.naukma.shop.view.AddNewProductView;
 import com.naukma.shop.view.AddNewSupplierView;
 import com.naukma.shop.view.ManagerView;
 import com.naukma.shop.view.OrderProductView;
 import com.naukma.shop.view.ReportOnFinancialResultsView;
+import com.naukma.shop.view.ReportOnSalesOnMonthView;
 import com.naukma.shop.utils.PrintPreview;
 import com.naukma.shop.utils.Strings;
 
@@ -34,6 +36,7 @@ public class ManagerController extends AbstractController {
 	private AddNewSupplierView addNewSupplierView;
 	private AddNewProductView addNewProductView;
 	private ReportOnFinancialResultsView reportOnFinancialResultsView;
+	private ReportOnSalesOnMonthView reportOnSalesOnMonthView;
 
 	public ManagerController() {
 		managerView = new ManagerView();
@@ -41,6 +44,7 @@ public class ManagerController extends AbstractController {
 		addNewSupplierView = new AddNewSupplierView();
 		addNewProductView = new AddNewProductView();
 		reportOnFinancialResultsView = new ReportOnFinancialResultsView();
+		reportOnSalesOnMonthView = new ReportOnSalesOnMonthView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
@@ -67,6 +71,13 @@ public class ManagerController extends AbstractController {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(reportOnFinancialResultsView);
 	        	prepareReportOnFinancialResultsView();
+	        }
+		});
+		
+		managerView.getBtnReportOnSalesOnMonth().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(reportOnSalesOnMonthView);
+	        	prepareReportOnSalesOnMonthView();
 	        }
 		});
 	}
@@ -222,6 +233,7 @@ public class ManagerController extends AbstractController {
 			
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(managerView);
+	        	reportOnFinancialResultsView.getComboBox().removeAllItems();
 	        	purgeReportOnFinancialResultsView();
 	        }
 		});
@@ -255,15 +267,15 @@ public class ManagerController extends AbstractController {
 	        	
 	        	Calendar endCal = Calendar.getInstance();
 	        	endCal.setTime(endDate);
-	        	endCal.set(Calendar.HOUR_OF_DAY, 0);
-	        	endCal.set(Calendar.MINUTE, 0);
-	        	endCal.set(Calendar.SECOND, 0);
+	        	endCal.set(Calendar.HOUR_OF_DAY, 23);
+	        	endCal.set(Calendar.MINUTE, 59);
+	        	endCal.set(Calendar.SECOND, 59);
 	        	endCal.set(Calendar.MILLISECOND, 0);
 	        	
 	        	long startDateMillis = startCal.getTimeInMillis();
 	        	long endDateMillis = endCal.getTimeInMillis();
 	        	
-	        	SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+	        	SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm");
 	        	
 	        	float totalIncome = 0;
 	        	int departmentId = ((Department)reportOnFinancialResultsView.getComboBox().getSelectedItem()).id;
@@ -276,8 +288,8 @@ public class ManagerController extends AbstractController {
 	        	reportOnFinancialResultsView.getTextField().setText(
 	        			"==== FINANCIAL REPORT ===="
 	        			+ "\nDepartment: " + reportOnFinancialResultsView.getComboBox().getSelectedItem()
-	        			+ "\nStart date: " + format.format(startDate)
-	        			+ "\nEnd date: " + format.format(endDate)
+	        			+ "\nStart date: " + format.format(startCal.getTime())
+	        			+ "\nEnd date: " + format.format(endCal.getTime())
 	        			+ "\n\nTotal income: " + totalIncome + " USD");
 	        }
 		});
@@ -297,6 +309,102 @@ public class ManagerController extends AbstractController {
 			}
 		} catch (DaoObjectException e) {
 			System.out.println("Exception in ManagerController::prepareReportOnFinancialResultsView" + e.getMessage());
+		}
+	}
+	
+	private void prepareReportOnSalesOnMonthView() {
+		reportOnSalesOnMonthView.getBtnClose().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	reportOnSalesOnMonthView.getComboBox().removeAllItems();
+	        	purgeReportOnSalesOnMonthView();
+	        }
+		});
+		
+		reportOnSalesOnMonthView.getBtnPrint().addActionListener(new ActionListener() {
+				
+	        public void actionPerformed(ActionEvent e) {
+	        	try {
+	        		reportOnSalesOnMonthView.getTextPane().print();
+				} catch (PrinterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+		});
+		
+		reportOnSalesOnMonthView.getBtnReport().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	purgeReportOnSalesOnMonthView();
+	        	
+	        	int startYear = reportOnSalesOnMonthView.getYearStartChooser().getYear();
+	        	int endYear = reportOnSalesOnMonthView.getYearEndChooser().getYear();
+	        	
+	        	int startMonth = reportOnSalesOnMonthView.getMonthStartChooser().getMonth();
+	        	int endMonth = reportOnSalesOnMonthView.getMonthEndChooser().getMonth();
+	        	
+	        	Calendar startCal = Calendar.getInstance();
+	        	startCal.set(Calendar.YEAR, startYear);
+	        	startCal.set(Calendar.MONTH, startMonth);
+	        	startCal.set(Calendar.DAY_OF_MONTH, 1);
+	        	startCal.set(Calendar.HOUR_OF_DAY, 0);
+	        	startCal.set(Calendar.MINUTE, 0);
+	        	startCal.set(Calendar.SECOND, 0);
+	        	startCal.set(Calendar.MILLISECOND, 0);
+	        	
+	        	Calendar endCal = Calendar.getInstance();
+	        	endCal.set(Calendar.YEAR, endYear);
+	        	endCal.set(Calendar.MONTH, endMonth);
+	        	endCal.set(Calendar.DAY_OF_MONTH, endCal.getActualMaximum(Calendar.DAY_OF_MONTH));
+	        	endCal.set(Calendar.HOUR_OF_DAY, 23);
+	        	endCal.set(Calendar.MINUTE, 59);
+	        	endCal.set(Calendar.SECOND, 59);
+	        	endCal.set(Calendar.MILLISECOND, 0);
+	        	
+	        	long startDateMillis = startCal.getTimeInMillis();
+	        	long endDateMillis = endCal.getTimeInMillis();
+	        	
+	        	SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm");
+	        	
+	        	Vector<MonthSalesCount> monthlySales = null;
+	        	
+	        	int departmentId = ((Department)reportOnSalesOnMonthView.getComboBox().getSelectedItem()).id;
+	        	if (departmentId == -1) {
+	        		monthlySales = MonthSalesCount.getMonthSalesCountByPeriodAll(startDateMillis, endDateMillis);
+	        	}
+	        	else {
+	        		monthlySales = MonthSalesCount.getMonthSalesCountByPeriodDepartment(startDateMillis, endDateMillis, departmentId);
+	        	}
+	        	reportOnSalesOnMonthView.getTextPane().setText(
+	        			"==== MONTHLY SALES REPORT ===="
+	        			+ "\nDepartment: " + reportOnSalesOnMonthView.getComboBox().getSelectedItem()
+	        			+ "\nStart date: " + format.format(startCal.getTime())
+	        			+ "\nEnd date: " + format.format(endCal.getTime()) + "\n");
+	        	
+	        	for (MonthSalesCount msc:monthlySales) {
+	        		String beforeContent = reportOnSalesOnMonthView.getTextPane().getText();
+	        		reportOnSalesOnMonthView.getTextPane().setText(beforeContent + "\n"+msc.month + "\t" + msc.id + " USD");
+	        	}
+	        }
+		});
+		
+		// need to load all departments
+		try {
+			// adding fake department to represent whole shop
+			Department allDepartments = new Department();
+			allDepartments.id = -1;
+			allDepartments.name = "ALL DEPARTMENTS";
+			
+			reportOnSalesOnMonthView.getComboBox().addItem(allDepartments);
+			
+			Vector<Department> departments = Dao.getInstance().find(new Department());
+			for (int i = 0; i < departments.size(); ++i) {
+				reportOnSalesOnMonthView.getComboBox().addItem(departments.get(i));
+			}
+		} catch (DaoObjectException e) {
+			System.out.println("Exception in ManagerController::prepareReportOnSalesOnMonthView" + e.getMessage());
 		}
 	}
 	
@@ -322,6 +430,10 @@ public class ManagerController extends AbstractController {
 	
 	private void purgeReportOnFinancialResultsView() {
 		reportOnFinancialResultsView.getTextField().setText("");
+	}
+	
+	private void purgeReportOnSalesOnMonthView() {
+		reportOnSalesOnMonthView.getTextPane().setText("");
 	}
 	
 	@Override

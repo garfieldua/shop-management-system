@@ -23,14 +23,14 @@ import com.toedter.calendar.JMonthChooser;
 import com.toedter.calendar.JYearChooser;
 import java.awt.event.ActionEvent;
 
-public class ReportOnSalesOnMonthView extends Panel{
+public class ReportOnSalesOnMonthView extends PanelWithLogOut{
 	private JLabel lblEndDate;
 	private JLabel lblNewLabel;
 	private JButton btnPrint;
 	private JTextPane textPane;
 	private JComboBox comboBox;
 	private JLabel lblDepartment;
-	private JComponent btnClose;
+	private JButton btnClose;
 	private JLabel lblReportOn;
 	private JSeparator separator;
 	private JMonthChooser monthStartChooser;
@@ -109,7 +109,7 @@ public class ReportOnSalesOnMonthView extends Panel{
 		return btnPrint;
 	}
 
-	public JComponent getBtnClose() {
+	public JButton getBtnClose() {
 		return btnClose;
 	}
 
@@ -131,6 +131,14 @@ public class ReportOnSalesOnMonthView extends Panel{
 
 	public JButton getBtnReport() {
 		return btnReport;
+	}
+
+	public JTextPane getTextPane() {
+		return textPane;
+	}
+
+	public JComboBox getComboBox() {
+		return comboBox;
 	}
 }
 
