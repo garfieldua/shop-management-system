@@ -33,6 +33,7 @@ public class ManagerView extends PanelWithLogOut{
 	private JButton btnReportOnBalances;
 	private JButton btnReportOnFinancial;
 	private JButton btnReportOnSellers;
+	private JButton btnReportOnSalesOnMonth;
 
 	public ManagerView() {
 		lblManagerView = new JLabel("Manager View");
@@ -55,7 +56,7 @@ public class ManagerView extends PanelWithLogOut{
 		btnAddNewSupplier.setBounds(175, 215, 250, 25);
 		add(btnAddNewSupplier);
 		
-		btnReportOnSales = new JButton("Report on sales");
+		btnReportOnSales = new JButton("Report on sales on days");
 		btnReportOnSales.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnReportOnSales.setBounds(175, 255, 250, 25);
 		add(btnReportOnSales);
@@ -74,6 +75,11 @@ public class ManagerView extends PanelWithLogOut{
 		btnReportOnSellers.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnReportOnSellers.setBounds(175, 375, 250, 25);
 		add(btnReportOnSellers);
+		
+		btnReportOnSalesOnMonth = new JButton("Report on sales on month");
+		btnReportOnSalesOnMonth.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnReportOnSalesOnMonth.setBounds(175, 415, 250, 25);
+		add(btnReportOnSalesOnMonth);
 	}
 
 	public JButton getBtnAddNewSupplier() {
@@ -81,7 +87,7 @@ public class ManagerView extends PanelWithLogOut{
 	}
 
 	public JButton getBtnReportOnSales() {
-		return btnReportOnSales;
+		return btnReportOnSalesOnMonth;
 	}
 
 	public JButton getBtnReportOnBalances() {
@@ -102,6 +108,22 @@ public class ManagerView extends PanelWithLogOut{
 
 	public JButton getBtnOrderProducts() {
 		return btnOrderProducts;
+	}
+	
+	public JButton getBtnReportOnSalesOnMonth() {
+		return btnReportOnSalesOnMonth;
+	}
+	
+	public void addListener(ActionListener l){
+		this.getBtnOrderProducts().addActionListener(l);
+		this.getBtnAddNewProduct().addActionListener(l);
+		this.getBtnReportOnSellers().addActionListener(l);
+		this.getBtnReportOnFinancial().addActionListener(l);
+		this.getBtnReportOnBalances().addActionListener(l);
+		this.getBtnReportOnSales().addActionListener(l);
+		this.getBtnAddNewSupplier().addActionListener(l);
+		this.getBtnReportOnSalesOnMonth().addActionListener(l);
+	
 	}
 }
 
