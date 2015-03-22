@@ -19,7 +19,7 @@ import com.toedter.calendar.JDayChooser;
 import com.toedter.calendar.JDateChooser;
 import java.awt.event.ActionEvent;
 
-public class ReportOnFinancialResultsView extends Panel{
+public class ReportOnFinancialResultsView extends PanelWithLogOut{
 	private JButton btnPrint;
 	private JLabel lblReportOn;
 	private JButton btnClose;

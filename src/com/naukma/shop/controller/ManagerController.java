@@ -2,9 +2,12 @@ package com.naukma.shop.controller;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.util.Calendar;
 import java.util.Date;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.Vector;
 
 import javax.swing.JButton;
@@ -15,6 +18,7 @@ import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.Objects.Department;
 import com.naukma.shop.database.Objects.OrderedItem;
 import com.naukma.shop.database.Objects.Product;
+import com.naukma.shop.database.Objects.SoldItem;
 import com.naukma.shop.database.Objects.Supplier;
 import com.naukma.shop.view.AddNewProductView;
 import com.naukma.shop.view.AddNewSupplierView;
@@ -222,6 +226,18 @@ public class ManagerController extends AbstractController {
 	        }
 		});
 		
+		reportOnFinancialResultsView.getBtnPrint().addActionListener(new ActionListener() {
+			
+	        public void actionPerformed(ActionEvent e) {
+	        	try {
+					reportOnFinancialResultsView.getTextField().print();
+				} catch (PrinterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+		});
+		
 		reportOnFinancialResultsView.getBtnReport().addActionListener(new ActionListener() {
 			
 	        public void actionPerformed(ActionEvent e) {
@@ -230,19 +246,51 @@ public class ManagerController extends AbstractController {
 	        	Date startDate = reportOnFinancialResultsView.getDateFrom().getDate();
 	        	Date endDate = reportOnFinancialResultsView.getDateTo().getDate();
 	        	
-	        	java.sql.Date sqlStartDate = new java.sql.Date(startDate.getTime());
-	        	java.sql.Date sqlEndDate = new java.sql.Date(endDate.getTime());
+	        	Calendar startCal = Calendar.getInstance();
+	        	startCal.setTime(startDate);
+	        	startCal.set(Calendar.HOUR_OF_DAY, 0);
+	        	startCal.set(Calendar.MINUTE, 0);
+	        	startCal.set(Calendar.SECOND, 0);
+	        	startCal.set(Calendar.MILLISECOND, 0);
 	        	
+	        	Calendar endCal = Calendar.getInstance();
+	        	endCal.setTime(endDate);
+	        	endCal.set(Calendar.HOUR_OF_DAY, 0);
+	        	endCal.set(Calendar.MINUTE, 0);
+	        	endCal.set(Calendar.SECOND, 0);
+	        	endCal.set(Calendar.MILLISECOND, 0);
+	        	
+	        	long startDateMillis = startCal.getTimeInMillis();
+	        	long endDateMillis = endCal.getTimeInMillis();
+	        	
+	        	SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+	        	
+	        	float totalIncome = 0;
+	        	int departmentId = ((Department)reportOnFinancialResultsView.getComboBox().getSelectedItem()).id;
+	        	if (departmentId == -1) {
+	        		totalIncome = SoldItem.getTotalIncomeByPeriodAll(startDateMillis, endDateMillis);
+	        	}
+	        	else {
+	        		totalIncome = SoldItem.getTotalIncomeByPeriodDepartment(startDateMillis, endDateMillis, departmentId);
+	        	}
 	        	reportOnFinancialResultsView.getTextField().setText(
 	        			"==== FINANCIAL REPORT ===="
 	        			+ "\nDepartment: " + reportOnFinancialResultsView.getComboBox().getSelectedItem()
-	        			+ "\nStart date: " + sqlStartDate
-	        			+ "\nEnd date: " + sqlEndDate);
+	        			+ "\nStart date: " + format.format(startDate)
+	        			+ "\nEnd date: " + format.format(endDate)
+	        			+ "\n\nTotal income: " + totalIncome + " USD");
 	        }
 		});
 		
 		// need to load all departments
 		try {
+			// adding fake department to represent whole shop
+			Department allDepartments = new Department();
+			allDepartments.id = -1;
+			allDepartments.name = "ALL DEPARTMENTS";
+			
+			reportOnFinancialResultsView.getComboBox().addItem(allDepartments);
+			
 			Vector<Department> departments = Dao.getInstance().find(new Department());
 			for (int i = 0; i < departments.size(); ++i) {
 				reportOnFinancialResultsView.getComboBox().addItem(departments.get(i));

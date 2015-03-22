@@ -1,6 +1,7 @@
 package com.naukma.shop.database.Objects;
 
 import java.util.Date;
+import java.util.Vector;
 
 import com.naukma.shop.database.*;
 
@@ -49,5 +50,41 @@ public class SoldItem extends DaoObject {
 		super(id);
 	}
 
+	public static float getTotalIncomeByPeriodDepartment(long startDate, long endDate, int department) {
+		Vector<SoldItem> result = new Vector<SoldItem>();
+		SoldItem item = new SoldItem();
+		
+		try {
+			result = Dao.getInstance().executeRawQuery("SELECT * FROM sold_item INNER JOIN product ON sold_item.product_id=product.id WHERE date BETWEEN "+startDate+ " AND " + endDate + " AND product.department_id="+department).parseObjects(item);
+		} catch (DaoObjectException e) {
+			e.printStackTrace();
+		}
+		
+		float totalSum = 0;
+		
+		for (SoldItem s: result) {
+			totalSum += s.totalPrice;
+		}
+
+		return totalSum;
+	}
 	
+	public static float getTotalIncomeByPeriodAll(long startDate, long endDate) {
+		Vector<SoldItem> result = new Vector<SoldItem>();
+		SoldItem item = new SoldItem();
+		
+		try {
+			result = Dao.getInstance().executeRawQuery("SELECT * FROM sold_item WHERE date BETWEEN "+startDate+ " AND " + endDate).parseObjects(item);
+		} catch (DaoObjectException e) {
+			e.printStackTrace();
+		}
+		
+		float totalSum = 0;
+		
+		for (SoldItem s: result) {
+			totalSum += s.totalPrice;
+		}
+
+		return totalSum;
+	}
 }
