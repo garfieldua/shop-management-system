@@ -12,9 +12,11 @@ import java.util.Vector;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 
 import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
+import com.naukma.shop.database.WhereClause;
 import com.naukma.shop.database.Objects.Department;
 import com.naukma.shop.database.Objects.OrderedItem;
 import com.naukma.shop.database.Objects.Product;
@@ -25,6 +27,7 @@ import com.naukma.shop.view.AddNewProductView;
 import com.naukma.shop.view.AddNewSupplierView;
 import com.naukma.shop.view.ManagerView;
 import com.naukma.shop.view.OrderProductView;
+import com.naukma.shop.view.ReportOnBalancesView;
 import com.naukma.shop.view.ReportOnFinancialResultsView;
 import com.naukma.shop.view.ReportOnSalesOnMonthView;
 import com.naukma.shop.utils.PrintPreview;
@@ -37,6 +40,7 @@ public class ManagerController extends AbstractController {
 	private AddNewProductView addNewProductView;
 	private ReportOnFinancialResultsView reportOnFinancialResultsView;
 	private ReportOnSalesOnMonthView reportOnSalesOnMonthView;
+	private ReportOnBalancesView reportOnBalancesView;
 
 	public ManagerController() {
 		managerView = new ManagerView();
@@ -45,6 +49,7 @@ public class ManagerController extends AbstractController {
 		addNewProductView = new AddNewProductView();
 		reportOnFinancialResultsView = new ReportOnFinancialResultsView();
 		reportOnSalesOnMonthView = new ReportOnSalesOnMonthView();
+		reportOnBalancesView = new ReportOnBalancesView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
@@ -80,6 +85,13 @@ public class ManagerController extends AbstractController {
 	        	prepareReportOnSalesOnMonthView();
 	        }
 		});
+		
+		managerView.getBtnReportOnBalances().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(reportOnBalancesView);
+	        	prepareReportOnBalancesView();
+	        }
+		});
 	}
 	
 	private void prepareOrderProductView() {
@@ -88,6 +100,8 @@ public class ManagerController extends AbstractController {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(managerView);
 	        	purgeOrderProductView();
+	        	
+	
 	        }
 		});
 		
@@ -408,6 +422,97 @@ public class ManagerController extends AbstractController {
 		}
 	}
 	
+	private void prepareReportOnBalancesView() {
+		reportOnBalancesView.getBtnBack().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	reportOnBalancesView.getComboBox().removeAllItems();
+	        	purgeReportOnBalancesView();
+	        	
+	        	// remove action listener
+	    	    for( ActionListener al : reportOnBalancesView.getBtnPrint().getActionListeners() ) {
+	    	    	reportOnBalancesView.getBtnPrint().removeActionListener( al );
+	    	    }
+	        }
+		});
+		
+		reportOnBalancesView.getBtnPrint().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	try {
+	        		reportOnBalancesView.getTable().print();
+				} catch (PrinterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+		});
+		
+		
+		
+		reportOnBalancesView.getComboBox().addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		        // change
+		    	final Department d = (Department)reportOnBalancesView.getComboBox().getSelectedItem();
+		    	if (d != null) {
+		    		// clear previous one
+		    		purgeReportOnBalancesView();
+		    		
+		    		// build up new one
+		    		reportOnBalancesView.getModel().addColumn("Title");
+		    		reportOnBalancesView.getModel().addColumn("Quantity");
+		    		reportOnBalancesView.getModel().addColumn("Min Amount");
+					
+					JTable table = reportOnBalancesView.getTable();
+					table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+					table.getColumnModel().getColumn(0).setPreferredWidth(350);
+					table.getColumnModel().getColumn(1).setPreferredWidth(60);
+					table.getColumnModel().getColumn(2).setPreferredWidth(70);
+					
+					Vector<Product> products = null;
+					try {
+						if (d.id != -1) {
+							products = Dao.getInstance().Where(new WhereClause<Product>(){
+								public boolean compare(Product row) {
+									return row.departmentId == d.id;
+								}
+							}).find(new Product());
+						}
+						else {
+							products = Dao.getInstance().find(new Product());
+						}
+						
+						for (Product p: products) {
+							reportOnBalancesView.getModel().addRow(new Object[]{p.title, p.quantity, p.minAmount} );
+						}	
+					} catch (DaoObjectException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}	
+					
+
+		    	}
+		    }
+		});
+		
+		// need to load all departments
+		try {
+			// adding fake department to represent whole shop
+			Department allDepartments = new Department();
+			allDepartments.id = -1;
+			allDepartments.name = "ALL DEPARTMENTS";
+			
+			reportOnBalancesView.getComboBox().addItem(allDepartments);
+			
+			Vector<Department> departments = Dao.getInstance().find(new Department());
+			for (int i = 0; i < departments.size(); ++i) {
+				reportOnBalancesView.getComboBox().addItem(departments.get(i));
+			}
+		} catch (DaoObjectException e) {
+			System.out.println("Exception in ManagerController::prepareReportOnBalancesView" + e.getMessage());
+		}
+		
+	}
+	
 	private void purgeOrderProductView() {
 		orderProductView.getComboBox().removeAllItems();
 		orderProductView.getTextField().setText("");
@@ -434,6 +539,13 @@ public class ManagerController extends AbstractController {
 	
 	private void purgeReportOnSalesOnMonthView() {
 		reportOnSalesOnMonthView.getTextPane().setText("");
+	}
+	
+	private void purgeReportOnBalancesView() {
+		reportOnBalancesView.getModel().setRowCount(0);
+		reportOnBalancesView.getModel().setColumnCount(0);
+		//reportOnBalancesView.getTextPane().setText("");
+		//reportOnBalancesView.getComboBox().removeAllItems();
 	}
 	
 	@Override

@@ -16,15 +16,17 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
 
-public class ReportOnBalancesView extends Panel{
+public class ReportOnBalancesView extends PanelWithLogOut{
 	private JButton btnPrint;
-	private JScrollPane scrollPane;
+	private JTable table;
 	private JComboBox comboBox;
 	private JLabel lblDepartment;
-	private JButton btnClose;
+	private JButton btnBack;
 	private JLabel lblReportOn;
 	private JSeparator separator;
-
+	private DefaultTableModel model;
+	private JScrollPane scrollPane;
+	
 	public ReportOnBalancesView() {
 		
 		separator = new JSeparator();
@@ -36,10 +38,10 @@ public class ReportOnBalancesView extends Panel{
 		lblReportOn.setBounds(25, 15, 250, 25);
 		add(lblReportOn);
 		
-		btnClose = new JButton("Close");
-		btnClose.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		btnClose.setBounds(500, 15, 89, 30);
-		add(btnClose);
+		btnBack = new JButton("Back");
+		btnBack.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnBack.setBounds(22, 52, 89, 30);
+		add(btnBack);
 		
 		lblDepartment = new JLabel("Department");
 		lblDepartment.setFont(new Font("Tahoma", Font.PLAIN, 13));
@@ -51,25 +53,43 @@ public class ReportOnBalancesView extends Panel{
 		add(comboBox);
 		
 		scrollPane = new JScrollPane();
-		scrollPane.setBounds(100, 180, 380, 204);
+		scrollPane.setBounds(50, 190, 500, 222);
 		add(scrollPane);
+		    
+		model = new DefaultTableModel();
+		table = new JTable(model);
+		table.setEnabled(false);
+		scrollPane.setViewportView(table);
 		
 		btnPrint = new JButton("Print");
 		btnPrint.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnPrint.setBounds(450, 421, 100, 25);
 		add(btnPrint);
 	}
+	
+	public JComboBox getComboBox() {
+		return comboBox;
+	}
 
 	public JButton getBtnPrint() {
 		return btnPrint;
 	}
 
-	public JButton getBtnClose() {
-		return btnClose;
+	public JButton getBtnBack() {
+		return btnBack;
 	}
-	public void addListener(ActionListener l){
-		btnPrint.addActionListener(l);
-		btnClose.addActionListener(l);
+	
+	public JTable getTable() {
+		return table;
 	}
+
+	public DefaultTableModel getModel() {
+		return model;
+	}
+
+	public void setModel(DefaultTableModel model) {
+		this.model = model;
+	}
+	
 	}
 
