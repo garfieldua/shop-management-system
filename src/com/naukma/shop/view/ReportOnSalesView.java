@@ -6,7 +6,6 @@ import java.awt.Color;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.JTable;
@@ -16,11 +15,10 @@ import javax.swing.JComboBox;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
-
 import com.toedter.calendar.JDayChooser;
 import com.toedter.calendar.JDateChooser;
 
-public class ReportOnSalesView extends Panel{
+public class ReportOnSalesView extends PanelWithLogOut{
 	private JDateChooser dateChooser_1;
 	private JLabel lblEndDate;
 	private JLabel lblNewLabel;
@@ -32,6 +30,9 @@ public class ReportOnSalesView extends Panel{
 	private JButton btnClose;
 	private JLabel lblReportOn;
 	private JSeparator separator;
+	private JTable table;
+	private DefaultTableModel model;
+	private JButton btnReport;
 
 	public ReportOnSalesView() {
 		
@@ -39,14 +40,14 @@ public class ReportOnSalesView extends Panel{
 		separator.setBounds(0, 60, 600, 2);
 		add(separator);
 		
-		lblReportOn = new JLabel("Report on sales");
+		lblReportOn = new JLabel("Report on sales by day of week");
 		lblReportOn.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		lblReportOn.setBounds(25, 15, 250, 25);
 		add(lblReportOn);
 		
 		btnClose = new JButton("Close");
 		btnClose.setFont(new Font("Tahoma", Font.PLAIN, 13));
-		btnClose.setBounds(500, 15, 89, 30);
+		btnClose.setBounds(94, 381, 89, 30);
 		add(btnClose);
 		
 		lblDepartment = new JLabel("Department");
@@ -62,13 +63,23 @@ public class ReportOnSalesView extends Panel{
 		scrollPane.setBounds(100, 233, 375, 151);
 		add(scrollPane);
 		
+		model = new DefaultTableModel();
+		table = new JTable(model);
+		table.setEnabled(false);
+		scrollPane.setViewportView(table);
+		
 		btnPrint = new JButton("Print");
 		btnPrint.setFont(new Font("Tahoma", Font.PLAIN, 13));
 		btnPrint.setBounds(450, 421, 100, 25);
 		add(btnPrint);
 		
+		btnReport = new JButton("Report");
+		btnReport.setFont(new Font("Tahoma", Font.PLAIN, 13));
+		btnReport.setBounds(377, 384, 100, 25);
+		add(btnReport);
+		
 		dateChooser = new JDateChooser();
-		dateChooser.setBounds(225, 125, 100, 25);
+		dateChooser.setBounds(225, 125, 202, 25);
 		add(dateChooser);
 		
 		lblNewLabel = new JLabel("Start date");
@@ -82,7 +93,7 @@ public class ReportOnSalesView extends Panel{
 		add(lblEndDate);
 		
 		dateChooser_1 = new JDateChooser();
-		dateChooser_1.setBounds(225, 175, 100, 25);
+		dateChooser_1.setBounds(225, 175, 202, 25);
 		add(dateChooser_1);
 		
 		
@@ -91,6 +102,10 @@ public class ReportOnSalesView extends Panel{
 	public JButton getBtnPrint() {
 		return btnPrint;
 	}
+	
+	public JButton getBtnReport() {
+		return btnReport;
+	}
 
 	public JButton getBtnClose() {
 		return btnClose;
@@ -98,6 +113,38 @@ public class ReportOnSalesView extends Panel{
 	public void addListener(ActionListener l){
 		btnPrint.addActionListener(l);
 		btnClose.addActionListener(l);
+	}
+	
+	public JTable getTable() {
+		return table;
+	}
+
+	public DefaultTableModel getModel() {
+		return model;
+	}
+
+	public void setModel(DefaultTableModel model) {
+		this.model = model;
+	}
+	
+	public JComboBox getComboBox() {
+		return comboBox;
+	}
+
+	public JDateChooser getDateChooserEnd() {
+		return dateChooser_1;
+	}
+
+	public void setDateChooserEnd(JDateChooser dateChooser_1) {
+		this.dateChooser_1 = dateChooser_1;
+	}
+
+	public JDateChooser getDateChooserStart() {
+		return dateChooser;
+	}
+
+	public void setDateChooserStart(JDateChooser dateChooser) {
+		this.dateChooser = dateChooser;
 	}
 }
 

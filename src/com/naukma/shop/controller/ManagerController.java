@@ -31,6 +31,7 @@ import com.naukma.shop.view.OrderProductView;
 import com.naukma.shop.view.ReportOnBalancesView;
 import com.naukma.shop.view.ReportOnFinancialResultsView;
 import com.naukma.shop.view.ReportOnSalesOnMonthView;
+import com.naukma.shop.view.ReportOnSalesView;
 import com.naukma.shop.view.ReportOnSellersEffectivnessView;
 import com.naukma.shop.utils.PrintPreview;
 import com.naukma.shop.utils.Strings;
@@ -44,7 +45,8 @@ public class ManagerController extends AbstractController {
 	private ReportOnSalesOnMonthView reportOnSalesOnMonthView;
 	private ReportOnBalancesView reportOnBalancesView;
 	private ReportOnSellersEffectivnessView reportOnSellersEffectivnessView;
-
+	private ReportOnSalesView reportOnSalesView;
+	
 	public ManagerController() {
 		managerView = new ManagerView();
 		orderProductView = new OrderProductView();
@@ -54,6 +56,7 @@ public class ManagerController extends AbstractController {
 		reportOnSalesOnMonthView = new ReportOnSalesOnMonthView();
 		reportOnBalancesView = new ReportOnBalancesView();
 		reportOnSellersEffectivnessView = new ReportOnSellersEffectivnessView();
+		reportOnSalesView = new ReportOnSalesView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
@@ -101,6 +104,13 @@ public class ManagerController extends AbstractController {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(reportOnSellersEffectivnessView);
 	        	prepareReportOnSellersEffectivnessView();
+	        }
+		});
+		
+		managerView.getBtnReportOnSales().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(reportOnSalesView);
+	        	prepareReportOnSalesView();
 	        }
 		});
 	}
@@ -696,9 +706,263 @@ public class ManagerController extends AbstractController {
 		}
 	}
 	
+	
+	// report on sales view (day of week)
+	// seller's effectiveness view
+	private void prepareReportOnSalesView() {
+		// back button
+		reportOnSalesView.getBtnClose().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	reportOnSalesView.getComboBox().removeAllItems();
+	        	purgeSalesView();
+	        	
+	        	// remove action listener
+	    	    for( ActionListener al : reportOnSalesView.getBtnPrint().getActionListeners() ) {
+	    	    	reportOnSalesView.getBtnPrint().removeActionListener( al );
+	    	    }
+	    	    
+	    	    for( ActionListener al : reportOnSalesView.getBtnReport().getActionListeners() ) {
+	    	    	reportOnSalesView.getBtnReport().removeActionListener( al );
+	    	    }
+	        }
+		});
+		
+		// print button
+		reportOnSalesView.getBtnPrint().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	try {
+	        		reportOnSalesView.getTable().print();
+				} catch (PrinterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+		});
+		
+		// report btn
+		reportOnSalesView.getBtnReport().addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	
+		    	
+		        // change
+		    	final Department d = (Department)reportOnSalesView.getComboBox().getSelectedItem();
+		    	if (d != null) {
+		    		// clear previous one
+		    		purgeSalesView();
+		    		
+		    		
+		    		// get dates
+		    		Date date_start = reportOnSalesView.getDateChooserStart().getDate();
+		    		Date date_end = reportOnSalesView.getDateChooserEnd().getDate();
+
+		    		// build up calendar
+		        	Calendar startCal = Calendar.getInstance();
+		        	if (date_start != null) {
+		        		startCal.setTime(date_start);
+		        	}
+		        	
+		        	Calendar endCal = Calendar.getInstance();
+		        	if (date_end != null) {
+		        		endCal.setTime(date_end);
+		        	}
+		        	
+		        	// get milliseconds
+		        	long startDateMillisTemp = startCal.getTimeInMillis();
+		        	long endDateMillisTemp = endCal.getTimeInMillis();
+		        	
+		        	// just to show something if end one is kinda wrong
+		        	if (endDateMillisTemp == startDateMillisTemp) {
+		        		endDateMillisTemp = endDateMillisTemp + 1000000000;
+		        	}
+		    		
+		        	final long startDateMillis = startDateMillisTemp;
+		        	final long endDateMillis = endDateMillisTemp;
+		        	
+		    		// build up new one
+		        	reportOnSalesView.getModel().addColumn("Day of week");
+		        	reportOnSalesView.getModel().addColumn("Quantity");
+		        	reportOnSalesView.getModel().addColumn("Money");
+					
+					JTable table = reportOnSalesView.getTable();
+					table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+					table.getColumnModel().getColumn(0).setPreferredWidth(250);
+					table.getColumnModel().getColumn(1).setPreferredWidth(60);
+					table.getColumnModel().getColumn(2).setPreferredWidth(70);
+					
+					//System.out.println("LOLz");
+					
+					// for each product we need to built up a row with it's sold quantity and price
+					
+					int monday_quanity = 0;
+					int monday_money = 0;
+					
+					int tuesday_quanity = 0;
+					int tuesday_money = 0;
+					
+					int wednesday_quanity = 0;
+					int wednesday_money = 0;
+					
+					int thursday_quanity = 0;
+					int thursday_money = 0;
+					
+					int friday_quanity = 0;
+					int friday_money = 0;
+					
+					int saturday_quanity = 0;
+					int saturday_money = 0;
+					
+					int sunday_quanity = 0;
+					int sunday_money = 0;
+					
+					
+					Vector<Product> products = null;
+					try {
+						// get all sellers
+						if (d.id != -1) {
+							products = Dao.getInstance().Where(new WhereClause<Product>(){
+								public boolean compare(Product row) {
+									return row.departmentId == d.id ;
+								}
+							}).find(new Product());
+						}
+						else {
+							products = Dao.getInstance().find(new Product());
+						}
+						
+						//System.out.println(sellers.size());
+						
+						// we got products
+						for (final Product product: products) {
+							Vector<SoldItem> solditems = null;
+							try {
+								solditems = Dao.getInstance().Where(new WhereClause<SoldItem>(){
+									public boolean compare(SoldItem row) {
+										// do calendar funcs
+										Calendar cal = Calendar.getInstance();
+										cal.setTime(row.date);
+										long curMillis = cal.getTimeInMillis(); 
+										
+										return row.productId == product.id && 
+												curMillis >= startDateMillis &&
+												curMillis <= endDateMillis;
+									}
+								}).find(new SoldItem());
+							
+								
+								for (SoldItem p: solditems) {
+									Calendar cal = Calendar.getInstance();
+									cal.setTime(p.date);
+									//long curMillis = cal.getTimeInMillis(); 
+									
+									switch (cal.get(Calendar.DAY_OF_WEEK)) {
+										case Calendar.MONDAY: {
+											monday_quanity += p.quantity;
+											monday_money += p.totalPrice;
+											
+											break;
+										}
+										
+										case Calendar.TUESDAY: {
+											tuesday_quanity += p.quantity;
+											tuesday_money += p.totalPrice;
+											
+											break;
+										}
+										
+										case Calendar.WEDNESDAY: {
+											wednesday_quanity += p.quantity;
+											wednesday_money += p.totalPrice;
+											
+											break;
+										}
+										
+										case Calendar.THURSDAY: {
+											thursday_quanity += p.quantity;
+											thursday_money += p.totalPrice;
+											
+											break;
+										}
+										
+										case Calendar.FRIDAY: {
+											friday_quanity += p.quantity;
+											friday_money += p.totalPrice;
+											
+											break;
+										}
+										
+										case Calendar.SATURDAY: {
+											saturday_quanity += p.quantity;
+											saturday_money += p.totalPrice;
+											
+											break;
+										}
+										
+										case Calendar.SUNDAY: {
+											sunday_quanity += p.quantity;
+											sunday_money += p.totalPrice;
+											
+											break;
+										}
+									}
+									//quantity += p.quantity;
+									//money += p.totalPrice;
+								}	
+								
+							} catch (DaoObjectException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}	
+						}	
+						
+						// end try 
+					} catch (DaoObjectException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}	
+					
+					reportOnSalesView.getModel().addRow(new Object[]{"Monday", monday_quanity, monday_money} );
+					reportOnSalesView.getModel().addRow(new Object[]{"Tuesday", tuesday_quanity, tuesday_money} );
+					reportOnSalesView.getModel().addRow(new Object[]{"Wednesday", wednesday_quanity, wednesday_money} );
+					reportOnSalesView.getModel().addRow(new Object[]{"Thursday", thursday_quanity, thursday_money} );
+					reportOnSalesView.getModel().addRow(new Object[]{"Friday", friday_quanity, friday_money } );
+					reportOnSalesView.getModel().addRow(new Object[]{"Saturday", saturday_quanity, saturday_money} );
+					reportOnSalesView.getModel().addRow(new Object[]{"Sunday", sunday_quanity, sunday_money} );
+					
+					// end :)
+
+		    	}
+		    }
+		});
+		
+		// load data for combobox
+		// need to load all departments
+		try {
+			// adding fake department to represent whole shop
+			Department allDepartments = new Department();
+			allDepartments.id = -1;
+			allDepartments.name = "ALL DEPARTMENTS";
+			
+			reportOnSalesView.getComboBox().addItem(allDepartments);
+			
+			Vector<Department> departments = Dao.getInstance().find(new Department());
+			for (int i = 0; i < departments.size(); ++i) {
+				reportOnSalesView.getComboBox().addItem(departments.get(i));
+			}
+		} catch (DaoObjectException e) {
+			System.out.println("Exception in ManagerController::prepareReportOnBalancesView" + e.getMessage());
+		}
+	}
+		
+	
 	private void purgeSellersEffectivnessView() {
 		reportOnSellersEffectivnessView.getModel().setRowCount(0);
 		reportOnSellersEffectivnessView.getModel().setColumnCount(0);
+	}
+	
+	private void purgeSalesView() {
+		reportOnSalesView.getModel().setRowCount(0);
+		reportOnSalesView.getModel().setColumnCount(0);
 	}
 	
 	private void purgeOrderProductView() {

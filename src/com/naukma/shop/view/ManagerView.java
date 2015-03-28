@@ -87,7 +87,7 @@ public class ManagerView extends PanelWithLogOut{
 	}
 
 	public JButton getBtnReportOnSales() {
-		return btnReportOnSalesOnMonth;
+		return btnReportOnSales;
 	}
 
 	public JButton getBtnReportOnBalances() {

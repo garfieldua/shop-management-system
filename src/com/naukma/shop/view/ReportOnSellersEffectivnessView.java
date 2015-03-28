@@ -18,7 +18,7 @@ import javax.swing.JSeparator;
 import com.toedter.calendar.JDayChooser;
 import com.toedter.calendar.JDateChooser;
 
-public class ReportOnSellersEffectivnessView extends Panel{
+public class ReportOnSellersEffectivnessView extends PanelWithLogOut{
 	private JDateChooser dateChooser_1;
 	private JLabel lblEndDate;
 	private JLabel lblNewLabel;
