@@ -18,6 +18,7 @@ import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObjectException;
 import com.naukma.shop.database.WhereClause;
 import com.naukma.shop.database.Objects.Department;
+import com.naukma.shop.database.Objects.Employee;
 import com.naukma.shop.database.Objects.OrderedItem;
 import com.naukma.shop.database.Objects.Product;
 import com.naukma.shop.database.Objects.SoldItem;
@@ -30,6 +31,7 @@ import com.naukma.shop.view.OrderProductView;
 import com.naukma.shop.view.ReportOnBalancesView;
 import com.naukma.shop.view.ReportOnFinancialResultsView;
 import com.naukma.shop.view.ReportOnSalesOnMonthView;
+import com.naukma.shop.view.ReportOnSellersEffectivnessView;
 import com.naukma.shop.utils.PrintPreview;
 import com.naukma.shop.utils.Strings;
 
@@ -41,6 +43,7 @@ public class ManagerController extends AbstractController {
 	private ReportOnFinancialResultsView reportOnFinancialResultsView;
 	private ReportOnSalesOnMonthView reportOnSalesOnMonthView;
 	private ReportOnBalancesView reportOnBalancesView;
+	private ReportOnSellersEffectivnessView reportOnSellersEffectivnessView;
 
 	public ManagerController() {
 		managerView = new ManagerView();
@@ -50,6 +53,7 @@ public class ManagerController extends AbstractController {
 		reportOnFinancialResultsView = new ReportOnFinancialResultsView();
 		reportOnSalesOnMonthView = new ReportOnSalesOnMonthView();
 		reportOnBalancesView = new ReportOnBalancesView();
+		reportOnSellersEffectivnessView = new ReportOnSellersEffectivnessView();
 		
 		managerView.getBtnOrderProducts().addActionListener(new ActionListener() {
 	        public void actionPerformed(ActionEvent e) {
@@ -90,6 +94,13 @@ public class ManagerController extends AbstractController {
 	        public void actionPerformed(ActionEvent e) {
 	        	MainController.getInstance().setPanel(reportOnBalancesView);
 	        	prepareReportOnBalancesView();
+	        }
+		});
+		
+		managerView.getBtnReportOnSellers().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(reportOnSellersEffectivnessView);
+	        	prepareReportOnSellersEffectivnessView();
 	        }
 		});
 	}
@@ -457,6 +468,8 @@ public class ManagerController extends AbstractController {
 		    		// clear previous one
 		    		purgeReportOnBalancesView();
 		    		
+		    		
+		    		
 		    		// build up new one
 		    		reportOnBalancesView.getModel().addColumn("Title");
 		    		reportOnBalancesView.getModel().addColumn("Quantity");
@@ -511,6 +524,181 @@ public class ManagerController extends AbstractController {
 			System.out.println("Exception in ManagerController::prepareReportOnBalancesView" + e.getMessage());
 		}
 		
+	}
+	
+	
+	// seller's effectiveness view
+	private void prepareReportOnSellersEffectivnessView() {
+		// back button
+		reportOnSellersEffectivnessView.getBtnClose().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	MainController.getInstance().setPanel(managerView);
+	        	reportOnSellersEffectivnessView.getComboBox().removeAllItems();
+	        	purgeSellersEffectivnessView();
+	        	
+	        	// remove action listener
+	    	    for( ActionListener al : reportOnSellersEffectivnessView.getBtnPrint().getActionListeners() ) {
+	    	    	reportOnSellersEffectivnessView.getBtnPrint().removeActionListener( al );
+	    	    }
+	    	    
+	    	    for( ActionListener al : reportOnSellersEffectivnessView.getBtnReport().getActionListeners() ) {
+	    	    	reportOnSellersEffectivnessView.getBtnReport().removeActionListener( al );
+	    	    }
+	        }
+		});
+		
+		// print button
+		reportOnSellersEffectivnessView.getBtnPrint().addActionListener(new ActionListener() {
+	        public void actionPerformed(ActionEvent e) {
+	        	try {
+	        		reportOnSellersEffectivnessView.getTable().print();
+				} catch (PrinterException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+	        }
+		});
+		
+		// report btn
+		reportOnSellersEffectivnessView.getBtnReport().addActionListener (new ActionListener () {
+		    public void actionPerformed(ActionEvent e) {
+		    	
+		    	
+		        // change
+		    	final Department d = (Department)reportOnSellersEffectivnessView.getComboBox().getSelectedItem();
+		    	if (d != null) {
+		    		// clear previous one
+		    		purgeSellersEffectivnessView();
+		    		
+		    		
+		    		// get dates
+		    		Date date_start = reportOnSellersEffectivnessView.getDateChooserStart().getDate();
+		    		Date date_end = reportOnSellersEffectivnessView.getDateChooserEnd().getDate();
+
+		    		// build up calendar
+		        	Calendar startCal = Calendar.getInstance();
+		        	if (date_start != null) {
+		        		startCal.setTime(date_start);
+		        	}
+		        	
+		        	Calendar endCal = Calendar.getInstance();
+		        	if (date_end != null) {
+		        		endCal.setTime(date_end);
+		        	}
+		        	
+		        	// get milliseconds
+		        	long startDateMillisTemp = startCal.getTimeInMillis();
+		        	long endDateMillisTemp = endCal.getTimeInMillis();
+		        	
+		        	// just to show something if end one is kinda wrong
+		        	if (endDateMillisTemp == startDateMillisTemp) {
+		        		endDateMillisTemp = endDateMillisTemp + 1000000000;
+		        	}
+		    		
+		        	final long startDateMillis = startDateMillisTemp;
+		        	final long endDateMillis = endDateMillisTemp;
+		        	
+		    		// build up new one
+		        	reportOnSellersEffectivnessView.getModel().addColumn("Name");
+		        	reportOnSellersEffectivnessView.getModel().addColumn("Quantity");
+		        	reportOnSellersEffectivnessView.getModel().addColumn("Money");
+					
+					JTable table = reportOnSellersEffectivnessView.getTable();
+					table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+					table.getColumnModel().getColumn(0).setPreferredWidth(250);
+					table.getColumnModel().getColumn(1).setPreferredWidth(60);
+					table.getColumnModel().getColumn(2).setPreferredWidth(70);
+					
+					//System.out.println("LOLz");
+					
+					
+					Vector<Employee> sellers = null;
+					try {
+						// get all sellers
+						if (d.id != -1) {
+							sellers = Dao.getInstance().Where(new WhereClause<Employee>(){
+								public boolean compare(Employee row) {
+									return row.departmentId == d.id ;
+								}
+							}).find(new Employee());
+						}
+						else {
+							sellers = Dao.getInstance().find(new Employee());
+						}
+						
+						//System.out.println(sellers.size());
+						
+						// we got sellers
+						for (final Employee employee: sellers) {
+							Vector<SoldItem> solditems = null;
+							try {
+								solditems = Dao.getInstance().Where(new WhereClause<SoldItem>(){
+									public boolean compare(SoldItem row) {
+										// do calendar funcs
+										Calendar cal = Calendar.getInstance();
+										cal.setTime(row.date);
+										long curMillis = cal.getTimeInMillis(); 
+										
+										return row.supplierId == employee.id && 
+												curMillis >= startDateMillis &&
+												curMillis <= endDateMillis;
+									}
+								}).find(new SoldItem());
+							
+								String sellername = employee.firstName + " " + employee.lastName;
+								int quantity = 0;
+								int money = 0;
+								
+								for (SoldItem p: solditems) {
+									quantity += p.quantity;
+									money += p.totalPrice;
+								}	
+								
+								if (quantity > 0) {
+									reportOnSellersEffectivnessView.getModel().addRow(new Object[]{sellername, quantity, money} );
+								}
+							} catch (DaoObjectException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}	
+						}	
+						
+						// end try 
+					} catch (DaoObjectException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}	
+					
+					
+					
+					// end :)
+
+		    	}
+		    }
+		});
+		
+		// load data for combobox
+		// need to load all departments
+		try {
+			// adding fake department to represent whole shop
+			Department allDepartments = new Department();
+			allDepartments.id = -1;
+			allDepartments.name = "ALL DEPARTMENTS";
+			
+			reportOnSellersEffectivnessView.getComboBox().addItem(allDepartments);
+			
+			Vector<Department> departments = Dao.getInstance().find(new Department());
+			for (int i = 0; i < departments.size(); ++i) {
+				reportOnSellersEffectivnessView.getComboBox().addItem(departments.get(i));
+			}
+		} catch (DaoObjectException e) {
+			System.out.println("Exception in ManagerController::prepareReportOnBalancesView" + e.getMessage());
+		}
+	}
+	
+	private void purgeSellersEffectivnessView() {
+		reportOnSellersEffectivnessView.getModel().setRowCount(0);
+		reportOnSellersEffectivnessView.getModel().setColumnCount(0);
 	}
 	
 	private void purgeOrderProductView() {

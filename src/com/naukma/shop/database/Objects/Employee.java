@@ -17,6 +17,9 @@ public class Employee extends DaoObject {
 	@Column(name = "first_name")
 	public String firstName;
 	
+	@Column(name = "last_name")
+	public String lastName;
+	
 	@Column(name = "position", required = true)
 	public String position;
 	
