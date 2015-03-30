@@ -10,9 +10,12 @@ import java.util.Vector;
 
 import com.naukma.shop.database.Dao;
 import com.naukma.shop.database.DaoObject;
+import com.naukma.shop.database.DaoResult;
 import com.naukma.shop.database.WhereClause;
 
 import com.naukma.shop.database.Objects.*;
+import com.naukma.shop.tests.Database;
+import com.naukma.shop.tests.mocks.MySQLProviderMock;
 import com.sun.jmx.snmp.Timestamp;
 
 
@@ -20,6 +23,14 @@ import com.sun.jmx.snmp.Timestamp;
 public class Tests {
 	
 	public static void main(String[] args) throws Exception {
+		
+		Dao mock = new Dao(new MySQLProviderMock()); 
+		
+		DaoResult mData = mock.executeRawQuery("Select 'test' as text");
+		
+		DaoResult data = Dao.getInstance().executeRawQuery("Select 'test' as text");
+		System.out.println(data.data().equals(mData.data()));
+		System.exit(0);
 		
 		// 10 last employees
 		Vector<Employee> result = Dao.getInstance().find(new Employee());		
@@ -32,7 +43,7 @@ public class Tests {
 		Employee person = new Employee(3); // me
 		System.out.println(person);
 		
-		// suppliers 
+		// suppliers 		
 		
 		Vector<Supplier> suppliers = Dao.getInstance().find(new Supplier(),100);
 		

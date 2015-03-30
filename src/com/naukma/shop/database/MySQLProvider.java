@@ -3,8 +3,11 @@ package com.naukma.shop.database;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.mysql.jdbc.PreparedStatement;
 import com.naukma.shop.utils.ConnectionConfig;
@@ -45,12 +48,35 @@ public final class MySQLProvider extends AbstractDataProvider {
 			
 			s.execute();
 			
-			ResultSet rs = s.getResultSet();
-			if (rs == null) {
-				rs = s.getGeneratedKeys();
+			ResultSet raw = s.getResultSet();
+			if (raw == null) {
+				raw = s.getGeneratedKeys();
 			}
+			
+			ArrayList<HashMap<String,String>> data = new ArrayList<HashMap<String,String>>();
+			try {
+				
+				ResultSetMetaData rsMetaData = raw.getMetaData();				
+				int columnCount = rsMetaData.getColumnCount();
 
-			return new DaoResult(rs);
+				while (raw.next()) {
+
+					HashMap<String,String> row = new HashMap<String,String>();
+
+					for (int i=0; i < columnCount; i++) {
+						String columnName = rsMetaData.getColumnName(i+1);
+						row.put(columnName, raw.getString(columnName));
+						
+					} 
+
+					data.add(row); 
+				}
+
+			} catch (SQLException e) {
+				// that's mean empty result
+			}
+			
+			return new DaoResult(data);
 		}
 
 		catch (SQLException e) {
